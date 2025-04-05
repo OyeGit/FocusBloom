@@ -470,24 +470,7 @@ private fun AddTaskScreenContent(
             }
 
             item {
-                BloomDropDown(
-                    label = {
-                        Text(
-                            text = "Task Type",
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 16.sp,
-                            ),
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    options = taskOptions,
-                    selectedOption = TextFieldState(selectedTaskType.name),
-                    onOptionSelected = onSelectedTaskTypeChange,
-                    textStyle = MaterialTheme.typography.titleSmall.copy(
-                        fontSize = 16.sp,
-                    ),
-                )
+
             }
 
             item {

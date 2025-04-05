@@ -30,9 +30,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,6 +51,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -58,7 +67,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.joelkanyi.focusbloom.core.domain.model.SessionType
 import com.joelkanyi.focusbloom.core.domain.model.Task
+import com.joelkanyi.focusbloom.core.domain.model.TaskType
 import com.joelkanyi.focusbloom.core.presentation.component.BloomButton
+import com.joelkanyi.focusbloom.core.presentation.component.BloomDropDown
+import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyType
+import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyUse
+import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyType
+import com.joelkanyi.focusbloom.core.presentation.component.LargeDropdownMenu
+import com.joelkanyi.focusbloom.core.presentation.component.PropertyPublishProgress
 import com.joelkanyi.focusbloom.core.presentation.component.TaskCard
 import com.joelkanyi.focusbloom.core.presentation.component.TaskProgress
 import com.joelkanyi.focusbloom.core.presentation.navigation.Destinations
@@ -66,6 +82,7 @@ import com.joelkanyi.focusbloom.core.presentation.theme.LongBreakColor
 import com.joelkanyi.focusbloom.core.presentation.theme.SessionColor
 import com.joelkanyi.focusbloom.core.presentation.theme.ShortBreakColor
 import com.joelkanyi.focusbloom.core.utils.koinViewModel
+import com.joelkanyi.focusbloom.core.utils.myPropertySummaryTest
 import com.joelkanyi.focusbloom.core.utils.pickFirstName
 import com.joelkanyi.focusbloom.core.utils.sessionType
 import com.joelkanyi.focusbloom.core.utils.taskCompleteMessage
@@ -91,6 +108,9 @@ fun HomeScreen(
         statusBarColor = MaterialTheme.colorScheme.background,
         navBarColor = MaterialTheme.colorScheme.background,
     )
+
+    val lat: Double = 6.5255
+    val lng: Double = 3.3792
     val tasksState = viewModel.tasks.collectAsState().value
     val username = viewModel.username.collectAsState().value ?: ""
     val hourFormat = viewModel.hourFormat.collectAsState().value
@@ -106,6 +126,7 @@ fun HomeScreen(
     val tickingTime = Timer.tickingTime.collectAsState().value
     val bottomSheetState = rememberModalBottomSheetState()
     val remindersOn = viewModel.remindersOn.collectAsState().value
+    val selectedStateOfN = "LAGOS"
 
     LaunchedEffect(viewModel) {
         when (remindersOn) {
@@ -157,6 +178,7 @@ fun HomeScreen(
     HomeScreenContent(
         tasksState = tasksState,
         timerState = timerState,
+        selectedStateOfN = selectedStateOfN,
         tickingTime = tickingTime,
         focusTimeColor = focusColor,
         shortBreakColor = shortBreakColor,
@@ -196,14 +218,19 @@ fun HomeScreen(
         },
         onClickAddTask = {
             navController.navigate(Destinations.AddTask())
+        },
+        onClickSearchProperties = {
+            navController.navigate(Destinations.AddSearchProperty( 0, 0))
         }
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HomeScreenContent(
     tasksState: TasksState,
     timerState: TimerState,
+    selectedStateOfN: String,
     tickingTime: Long,
     hourFormat: Int,
     sessionTime: Int,
@@ -218,7 +245,9 @@ private fun HomeScreenContent(
     longBreakColor: Long?,
     onClickActiveTaskOptions: (task: Task) -> Unit,
     onClickAddTask: () -> Unit,
+    onClickSearchProperties: () -> Unit
 ) {
+
     Scaffold { paddingValues ->
         Box(
             modifier = Modifier
@@ -292,10 +321,75 @@ private fun HomeScreenContent(
                             )
                         }
 
-                        if (tasks.isNotEmpty() && tasks.all { it.completed }.not()) {
-                            item {
-                                TodayTaskProgressCard(tasks)
-                            }
+                        item {
+                            MyPropertySummary(tasks)
+                        }
+
+
+                        item {
+
+
+                            ChipsPropertyType(
+                                modifier = Modifier.fillMaxWidth(),
+                                selectedOption = {
+                                    TextFieldState(selectedStateOfN)
+                                },
+                                onOptionSelected = {
+                                    //onSelectedTaskTypeChange
+                                },
+                                textStyle = MaterialTheme.typography.titleSmall.copy(
+                                    fontSize = 16.sp,
+                                ),
+                            )
+
+
+                            ChipsPropertyUse(
+                                modifier = Modifier.fillMaxWidth(),
+                                selectedOption = {
+                                    TextFieldState(selectedStateOfN)
+                                },
+                                onOptionSelected = {
+                                    //onSelectedTaskTypeChange
+                                },
+                                textStyle = MaterialTheme.typography.titleSmall.copy(
+                                    fontSize = 16.sp,
+                                ),
+                            )
+                        }
+
+
+                        item {
+
+                          /*  var selectedIndex by remember { mutableStateOf(-1) }
+                            LargeDropdownMenu(
+                                label = "States",
+                                items = listOf("Lagos", "Oyo", "Ogun"),
+                                selectedIndex = selectedIndex,
+                                onItemSelected = { index, _ -> selectedIndex = index },
+                            )*/
+                            var taskOptions: List<String> = listOf("Lagos", "Oyo", "Ogun")
+                            BloomDropDown(
+                                label = {
+                                    Text(
+                                        text = "State",
+                                        style = MaterialTheme.typography.titleSmall.copy(
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 16.sp,
+                                        ),
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                options = taskOptions,
+                                selectedOption = {
+                                    TextFieldState(selectedStateOfN)
+                                },
+                                onOptionSelected = {
+                                    //onSelectedTaskTypeChange
+                                },
+                                textStyle = MaterialTheme.typography.titleSmall.copy(
+                                    fontSize = 16.sp,
+                                ),
+                            )
                         }
 
                         if (overdueTasks.isNotEmpty()) {
@@ -401,7 +495,8 @@ private fun HomeScreenContent(
                             item {
                                 StartOrCompletedTaskComponent(
                                     tasks = tasks,
-                                    onClickAddTask = onClickAddTask
+                                    onClickAddTask = onClickAddTask,
+                                    onClickSearchProperties = onClickSearchProperties
                                 )
                             }
                         }
@@ -415,7 +510,8 @@ private fun HomeScreenContent(
 @Composable
 private fun StartOrCompletedTaskComponent(
     tasks: List<Task>,
-    onClickAddTask: () -> Unit
+    onClickAddTask: () -> Unit,
+    onClickSearchProperties: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -440,7 +536,7 @@ private fun StartOrCompletedTaskComponent(
                 fontWeight = FontWeight.Bold,
             ),
             text = if (tasks.isEmpty()) {
-                "Start your day productively! Add your first task."
+                "Start your property publishing! Add your first property."
             } else if (tasks.all { it.completed }) {
                 "Great job! You've finished all your tasks for today."
             } else {
@@ -454,7 +550,7 @@ private fun StartOrCompletedTaskComponent(
                 .padding(horizontal = 24.dp)
                 .fillMaxWidth(),
             text = if (tasks.isEmpty()) {
-                "To add a task, simply tap the '+' button on the screen. Fill in the task details and tap 'Save'."
+                "To add a property, simply tap the '+' button on the screen. Fill in the task details and tap 'Save'."
             } else if (tasks.all { it.completed }) {
                 "Now, take some time to have fun, recharge, maybe do some exercise, and consider opening your calendar to plan for tomorrow's tasks. Keep up the fantastic work!"
             } else {
@@ -467,13 +563,28 @@ private fun StartOrCompletedTaskComponent(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        BloomButton(
+            onClick = onClickAddTask,
+        ) {
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                text = "Search Properties",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         if (tasks.isEmpty()) {
             BloomButton(
                 onClick = onClickAddTask,
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    text = "Add Your First Task",
+                    text = "Add Your First Property",
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                     ),
@@ -600,6 +711,44 @@ private fun TodayTaskProgressCard(tasks: List<Task>) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "${tasks.filter { it.completed }.size} of ${tasks.size} tasks completed",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun MyPropertySummary(tasks: List<Task>) {
+    Card {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            PropertyPublishProgress(
+                mainColor = MaterialTheme.colorScheme.primary,
+                percentage = taskCompletionPercentage(tasks).toFloat(),
+                counterColor = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = myPropertySummaryTest(tasks),
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Try publishing to make a commission",
                     style = MaterialTheme.typography.labelMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                     ),

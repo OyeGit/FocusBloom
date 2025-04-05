@@ -44,6 +44,7 @@ kotlin {
             }
         }
     }
+
     jvm()
 
     iosArm64()
@@ -83,6 +84,7 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation(libs.kotlinX.serializationJson)
+//            implementation(libs.androidx.compose.ui)
 
             implementation(libs.material3.window.size.multiplatform)
 
@@ -137,11 +139,14 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.native.driver)
 
-
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)        }
     }
 }
+dependencies {
+    implementation(libs.androidx.foundation.android)
+}
+
 
 sqldelight {
     databases {

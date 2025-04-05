@@ -32,9 +32,29 @@ class OnboardingViewModel(
     val eventsFlow = _eventsFlow.receiveAsFlow()
 
     private val _username = MutableStateFlow("")
+    private val _password = MutableStateFlow("")
+
     val username = _username.asStateFlow()
+    val password = _password.asStateFlow()
     fun setUsername(username: String) {
         _username.value = username
+    }
+
+    fun setPassword(password: String) {
+        _password.value = password
+    }
+
+    fun setUsernamePassword (username: String, password: String ) {
+        _username.value = username
+        _password.value = password
+    }
+
+    fun saveUsernamePassword( ) {
+        viewModelScope.launch {
+            settingsRepository.saveUsernamePassword(username.value, password.value )
+            settingsRepository.toggleReminder(1)
+            _eventsFlow.send(UiEvents.Navigation)
+        }
     }
 
     fun saveUsername() {

@@ -160,8 +160,8 @@ private fun ColumnScope.PageIndicators(pageCount: Int, currentPage: Int) {
 @Composable
 private fun OnboardingFirstPage() {
     PageContent(
-        title = "Organize Tasks and Boost Productivity",
-        description = "Welcome to FocusBloom, your task management and productivity companion. Effortlessly organize your tasks and supercharge your productivity journey.",
+        title = "Welcome to NaijaList Properties",
+        description = "NaijaList Properties, your property management companion. Effortlessly list your properties for sale, rental, or lease.",
         illustration = Res.drawable.il_tasks,
     )
 }
@@ -169,8 +169,8 @@ private fun OnboardingFirstPage() {
 @Composable
 private fun OnboardingSecondPage() {
     PageContent(
-        title = "Tailor Your Work Sessions",
-        description = "With FocusBloom, you have the power to customize your work and break durations to match your preferences and maximize efficiency.",
+        title = "Easy to Use Property Listing",
+        description = "With NaijaList Properties, you have the power to customize and display your property using preferences to maximize efficiency.",
         illustration = Res.drawable.il_work_time,
     )
 }
@@ -179,7 +179,7 @@ private fun OnboardingSecondPage() {
 private fun OnboardingThirdPage() {
     PageContent(
         title = "Visualize Your Progress",
-        description = "Experience the power of progress tracking with FocusBloom. Gain insights into your productivity journey and visualize task completion trends.",
+        description = "Experience the power of progress tracking with NaijaList Properties. Gain insights into property views and inquiries",
         illustration = Res.drawable.il_statistics,
     )
 }

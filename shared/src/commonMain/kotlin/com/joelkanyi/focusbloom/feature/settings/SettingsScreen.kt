@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.VolumeUp
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Notifications
@@ -49,8 +48,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -546,15 +543,7 @@ private fun SoundSelection(
             modifier = Modifier.fillMaxWidth(.5f),
             text = title,
         )
-        BloomDropDown(
-            modifier = Modifier
-                .fillMaxWidth(),
-            options = options,
-            selectedOption = TextFieldState(text = selectedOption),
-            onOptionSelected = {
-                onSelectOption(it)
-            },
-        )
+
     }
 }
 

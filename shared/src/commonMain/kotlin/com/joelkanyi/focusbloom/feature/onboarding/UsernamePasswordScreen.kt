@@ -25,13 +25,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,11 +46,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -54,6 +64,8 @@ import com.joelkanyi.focusbloom.core.utils.koinViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun UsernameScreen(
@@ -61,7 +73,16 @@ fun UsernameScreen(
 ) {
     val viewModel = koinViewModel<OnboardingViewModel>()
     val username = viewModel.username.collectAsState().value
+    val password = viewModel.password.collectAsState().value
+    var showPassword by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(showPassword) {
+        if (showPassword) {
+            delay(2000)
+            showPassword = false
+        }
+    }
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.Main.immediate) {
@@ -71,7 +92,6 @@ fun UsernameScreen(
                         navController.popBackStack()
                         navController.navigate(Destinations.Home)
                     }
-
                     else -> {}
                 }
             }
@@ -80,13 +100,17 @@ fun UsernameScreen(
 
     UsernameScreenContent(
         username = username,
+        password=password,
         typeWriterTextParts = viewModel.typeWriterTextParts,
         onUsernameChange = {
             viewModel.setUsername(it)
         },
+        onPasswordChange = {
+            viewModel.setPassword(it)
+        },
         onClickContinue = {
             keyboardController?.hide()
-            viewModel.saveUsername()
+            viewModel.saveUsernamePassword()
         },
     )
 }
@@ -94,8 +118,10 @@ fun UsernameScreen(
 @Composable
 fun UsernameScreenContent(
     username: String,
+    password: String,
     typeWriterTextParts: List<String>,
     onUsernameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
     onClickContinue: () -> Unit,
 ) {
     LazyColumn(
@@ -105,7 +131,7 @@ fun UsernameScreenContent(
     ) {
         item {
             TypewriterText(
-                baseText = "Focus Bloom app is what you need to",
+                baseText = "Naijalist Properties is what you need to",
                 parts = typeWriterTextParts,
             )
         }
@@ -132,6 +158,34 @@ fun UsernameScreenContent(
                 name = username,
                 onNameChange = {
                     onUsernameChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(56.dp))
+            Text(
+                text = "What's your password?",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 18.sp,
+                ),
+            )
+        }
+
+        item {
+            val focusRequester = remember { FocusRequester() }
+            var passwordVisibility: Boolean by remember { mutableStateOf(false) }
+            PasswordTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                name = password,
+                passwordVisibility = passwordVisibility,
+                onNameChange = {
+                    onPasswordChange(it)
                 },
                 onClickDone = {
                     onClickContinue()
@@ -204,6 +258,58 @@ private fun UsernameTextField(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Words,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onClickDone()
+            },
+        ),
+    )
+}
+
+
+@Composable
+private fun PasswordTextField(
+    modifier: Modifier,
+    name: String,
+    onNameChange: (String) -> Unit,
+    onClickDone: () -> Unit,
+    passwordVisibility: Boolean,
+) {
+    TextField(
+        modifier = modifier,
+        value = name,
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        onValueChange = onNameChange,
+        maxLines = 1,
+        singleLine = true,
+        placeholder = {
+            Text(
+                text = "Password",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.ExtraLight,
+                    fontSize = 18.sp,
+                    letterSpacing = -(1.6).sp,
+                    lineHeight = 32.sp,
+                ),
+            )
+        },
+
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            disabledIndicatorColor = MaterialTheme.colorScheme.primary,
+        ),
+        textStyle = MaterialTheme.typography.labelLarge.copy(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+            capitalization = KeyboardCapitalization.None,
         ),
         keyboardActions = KeyboardActions(
             onDone = {

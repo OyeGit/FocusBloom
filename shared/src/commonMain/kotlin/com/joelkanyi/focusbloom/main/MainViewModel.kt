@@ -41,6 +41,8 @@ class MainViewModel(
             started = SharingStarted.WhileSubscribed(),
             initialValue = OnBoardingState.Loading,
         )
+
+
 }
 
 sealed class OnBoardingState {

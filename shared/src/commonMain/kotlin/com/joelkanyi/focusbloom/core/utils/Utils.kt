@@ -305,6 +305,15 @@ fun taskCompleteMessage(tasks: List<Task>): String {
     }
 }
 
+fun myPropertySummaryTest(tasks: List<Task>): String {
+    val completedTasks = tasks.filter { it.completed }.size
+    return if (completedTasks != 0) {
+        "Congrats! You've completed all your tasks for today"
+    } else {
+        "You've not published any properties"
+    }
+}
+
 fun taskCompletionPercentage(tasks: List<Task>): Int {
     val completedTasks = tasks.filter { it.completed }.size
     return if (completedTasks == 0) {

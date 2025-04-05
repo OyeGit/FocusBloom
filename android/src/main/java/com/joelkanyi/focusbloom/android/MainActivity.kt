@@ -61,11 +61,13 @@ class MainActivity : ComponentActivity() {
                 }
             })
 
-            /*val notificationUtils = NotificationsManager(this)
+            /*
+            val notificationUtils = NotificationsManager(this)
             notificationUtils.showUpdateNotification(
                 "FocusBloom",
                 "FocusBloom is running in the background",
-            )*/
+            )
+            */
             FocusBloomApp()
         }
     }

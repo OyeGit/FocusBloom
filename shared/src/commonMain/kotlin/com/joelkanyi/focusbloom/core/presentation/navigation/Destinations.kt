@@ -31,6 +31,9 @@ sealed class Destinations {
     data class AllTasks(val type: String)
 
     @Serializable
+    data class AddSearchProperty(val lat: Long, val lng: Long)
+
+    @Serializable
     data class AddTask(val taskId: Int = -1)
 
     @Serializable

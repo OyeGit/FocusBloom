@@ -46,7 +46,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.joelkanyi.focusbloom.core.domain.model.TextFieldState
 
 @Composable
 fun <T> BloomDropDown(
@@ -54,7 +53,7 @@ fun <T> BloomDropDown(
     label: (@Composable () -> Unit)? = null,
     options: List<T>,
     enabled: Boolean = true,
-    selectedOption: TextFieldState,
+    selectedOption: () -> Unit,
     onOptionSelected: (T) -> Unit,
     textStyle: TextStyle = MaterialTheme.typography.titleSmall,
     shape: CornerBasedShape = MaterialTheme.shapes.small,
@@ -96,10 +95,7 @@ fun <T> BloomDropDown(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(
-                    text = selectedOption.text,
-                    style = textStyle,
-                )
+
                 if (enabled) {
                     Icon(
                         modifier = Modifier
@@ -134,14 +130,6 @@ fun <T> BloomDropDown(
                 }
             }
         }
-        if (!selectedOption.error.isNullOrEmpty()) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = selectedOption.error,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.End,
-            )
-        }
+
     }
 }

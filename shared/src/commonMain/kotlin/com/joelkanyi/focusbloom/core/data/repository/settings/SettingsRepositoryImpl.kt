@@ -15,13 +15,17 @@
  */
 package com.joelkanyi.focusbloom.core.data.repository.settings
 
+import com.joelkanyi.focusbloom.AppLogger
 import com.joelkanyi.focusbloom.core.data.local.setting.PreferenceManager
 import com.joelkanyi.focusbloom.core.domain.repository.settings.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 
+private val tag = SettingsRepositoryImpl::class.qualifiedName.toString()
+
 class SettingsRepositoryImpl(
     private val preferenceManager: PreferenceManager,
 ) : SettingsRepository {
+
     override suspend fun saveAppTheme(theme: Int) {
         preferenceManager.setInt(key = PreferenceManager.APP_THEME, value = theme)
     }
@@ -92,6 +96,11 @@ class SettingsRepositoryImpl(
 
     override fun saveUsername(value: String) {
         preferenceManager.setString(key = PreferenceManager.USERNAME, value = value)
+    }
+
+    override fun saveUsernamePassword(username: String, password: String) {
+        preferenceManager.setString(key = PreferenceManager.USERNAME, value = username)
+        AppLogger.i( tag, "saveUsernamePassword() - username = "+username )
     }
 
     override fun getUsername(): Flow<String?> {
