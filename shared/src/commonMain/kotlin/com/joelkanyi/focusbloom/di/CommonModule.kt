@@ -24,8 +24,10 @@ import com.joelkanyi.focusbloom.core.data.adapter.currentCycleAdapter
 import com.joelkanyi.focusbloom.core.data.adapter.focusSessionsAdapter
 import com.joelkanyi.focusbloom.core.data.adapter.idAdapter
 import com.joelkanyi.focusbloom.core.data.local.setting.PreferenceManager
+import com.joelkanyi.focusbloom.core.data.repository.properties.PropertiesRepositoryImpl
 import com.joelkanyi.focusbloom.core.data.repository.settings.SettingsRepositoryImpl
 import com.joelkanyi.focusbloom.core.data.repository.tasks.TasksRepositoryImpl
+import com.joelkanyi.focusbloom.core.domain.repository.properties.PropertiesRepository
 import com.joelkanyi.focusbloom.core.domain.repository.settings.SettingsRepository
 import com.joelkanyi.focusbloom.core.domain.repository.tasks.TasksRepository
 import com.joelkanyi.focusbloom.database.BloomDatabase
@@ -71,6 +73,12 @@ fun commonModule() = module {
 
     single<TasksRepository> {
         TasksRepositoryImpl(
+            bloomDatabase = get(),
+        )
+    }
+
+    single<PropertiesRepository> {
+        PropertiesRepositoryImpl(
             bloomDatabase = get(),
         )
     }

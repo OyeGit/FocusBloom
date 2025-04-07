@@ -17,7 +17,9 @@ package com.joelkanyi.focusbloom.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.joelkanyi.focusbloom.core.domain.model.Property
 import com.joelkanyi.focusbloom.core.domain.model.Task
+import com.joelkanyi.focusbloom.core.domain.repository.properties.PropertiesRepository
 import com.joelkanyi.focusbloom.core.domain.repository.settings.SettingsRepository
 import com.joelkanyi.focusbloom.core.domain.repository.tasks.TasksRepository
 import com.joelkanyi.focusbloom.core.utils.plusDays
@@ -35,12 +37,57 @@ import kotlinx.datetime.toLocalDateTime
 class HomeViewModel(
     private val tasksRepository: TasksRepository,
     private val settingsRepository: SettingsRepository,
+    private val propertiesRepository: PropertiesRepository
 ) : ViewModel() {
     private val _openBottomSheet = MutableStateFlow(false)
     val openBottomSheet = _openBottomSheet.asStateFlow()
+
+    val queryParam =hashMapOf<String, Any?>()
+
     fun openBottomSheet(value: Boolean) {
         _openBottomSheet.value = value
     }
+
+    val properties = propertiesRepository.getProperties( queryParam  )
+        .map { properties ->
+            PropertiesState.Success(
+                queryParam = queryParam,
+                propertyList = properties
+                    .sortedBy { it.idProp }
+
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = TasksState.Loading,
+        )
+
+    val tasks = tasksRepository.getTasks()
+        .map { tasks ->
+            TasksState.Success(
+                tasks = tasks
+                    .sortedBy { it.start }
+                    .filter {
+                        it.date.date == Clock.System.now()
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    },
+                overdueTasks = tasks
+                    .sortedBy { it.start }
+                    .filter {
+                        it.date.date < Clock.System.now()
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date &&
+                                !it.completed
+                    },
+
+
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = TasksState.Loading,
+        )
 
     val hourFormat = settingsRepository.getHourFormat()
         .map { it ?: 24 }
@@ -135,30 +182,6 @@ class HomeViewModel(
         }
     }
 
-    val tasks = tasksRepository.getTasks()
-        .map { tasks ->
-            TasksState.Success(
-                tasks = tasks
-                    .sortedBy { it.start }
-                    .filter {
-                        it.date.date == Clock.System.now()
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                    },
-                overdueTasks = tasks
-                    .sortedBy { it.start }
-                    .filter {
-                        it.date.date < Clock.System.now()
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date &&
-                            !it.completed
-                    },
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = TasksState.Loading,
-        )
-
     val username = settingsRepository.getUsername()
         .map { it }
         .stateIn(
@@ -202,8 +225,16 @@ sealed class TasksState {
     data object Loading : TasksState()
     data class Success(
         val tasks: List<Task>,
-        val overdueTasks: List<Task>,
+        val overdueTasks: List<Task>
     ) : TasksState()
+}
+
+sealed class PropertiesState {
+    data object Loading : PropertiesState()
+    data class Success(
+        val queryParam: HashMap<String, Any?>,
+        val propertyList: List<Property>
+    ) : PropertiesState()
 }
 
 sealed class ReminderState {

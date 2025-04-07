@@ -66,7 +66,8 @@ fun <T> BloomDropDown(
         }
         Box(
             modifier = modifier
-                .height(56.dp)
+                .height(42.dp)
+                .padding(start=12.dp, end=12.dp)
                 // .menuAnchor()
                 .border(
                     width = 1.dp,

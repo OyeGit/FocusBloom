@@ -31,13 +31,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,10 +48,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -65,15 +59,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.joelkanyi.focusbloom.core.domain.model.Property
 import com.joelkanyi.focusbloom.core.domain.model.SessionType
 import com.joelkanyi.focusbloom.core.domain.model.Task
-import com.joelkanyi.focusbloom.core.domain.model.TaskType
 import com.joelkanyi.focusbloom.core.presentation.component.BloomButton
 import com.joelkanyi.focusbloom.core.presentation.component.BloomDropDown
 import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyType
 import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyUse
-import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyType
-import com.joelkanyi.focusbloom.core.presentation.component.LargeDropdownMenu
+import com.joelkanyi.focusbloom.core.presentation.component.PropertyCard
 import com.joelkanyi.focusbloom.core.presentation.component.PropertyPublishProgress
 import com.joelkanyi.focusbloom.core.presentation.component.TaskCard
 import com.joelkanyi.focusbloom.core.presentation.component.TaskProgress
@@ -93,6 +86,7 @@ import com.joelkanyi.focusbloom.feature.home.component.TaskOptionsBottomSheet
 import com.joelkanyi.focusbloom.feature.taskprogress.Timer
 import com.joelkanyi.focusbloom.feature.taskprogress.TimerState
 import com.joelkanyi.focusbloom.platform.StatusBarColors
+import com.joelkanyi.focusbloom.resource.PictureData
 import focusbloom.shared.generated.resources.Res
 import focusbloom.shared.generated.resources.il_completed
 import focusbloom.shared.generated.resources.il_empty
@@ -112,6 +106,7 @@ fun HomeScreen(
     val lat: Double = 6.5255
     val lng: Double = 3.3792
     val tasksState = viewModel.tasks.collectAsState().value
+    val propertiesState = viewModel.properties.collectAsState().value
     val username = viewModel.username.collectAsState().value ?: ""
     val hourFormat = viewModel.hourFormat.collectAsState().value
     val sessionTime = viewModel.sessionTime.collectAsState().value ?: 25
@@ -126,6 +121,7 @@ fun HomeScreen(
     val tickingTime = Timer.tickingTime.collectAsState().value
     val bottomSheetState = rememberModalBottomSheetState()
     val remindersOn = viewModel.remindersOn.collectAsState().value
+
     val selectedStateOfN = "LAGOS"
 
     LaunchedEffect(viewModel) {
@@ -188,6 +184,7 @@ fun HomeScreen(
         shortBreakTime = shortBreakTime,
         longBreakTime = longBreakTime,
         username = username,
+        propertiesState = propertiesState,
         onClickTask = {
             if (it.date.date < today().date) {
                 viewModel.selectTask(it)
@@ -221,226 +218,277 @@ fun HomeScreen(
         },
         onClickSearchProperties = {
             navController.navigate(Destinations.AddSearchProperty( 0, 0))
-        }
+        } ,
+
     )
+
 }
 
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun HomeScreenContent(
-    tasksState: TasksState,
-    timerState: TimerState,
-    selectedStateOfN: String,
-    tickingTime: Long,
-    hourFormat: Int,
-    sessionTime: Int,
-    shortBreakTime: Int,
-    longBreakTime: Int,
-    username: String,
-    onClickTask: (task: Task) -> Unit,
-    onClickSeeAllTasks: (type: String) -> Unit,
-    onClickTaskOptions: (task: Task) -> Unit,
-    focusTimeColor: Long?,
-    shortBreakColor: Long?,
-    longBreakColor: Long?,
-    onClickActiveTaskOptions: (task: Task) -> Unit,
-    onClickAddTask: () -> Unit,
-    onClickSearchProperties: () -> Unit
-) {
-
-    Scaffold { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-        ) {
-            when (tasksState) {
-                TasksState.Loading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                    )
-                }
-
-                is TasksState.Success -> {
-                    val tasks = tasksState.tasks.sortedByDescending { it.completed.not() }
-                    val overdueTasks = tasksState.overdueTasks
-                    val activeTask = tasks.firstOrNull { it.active }
-
-                    LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        if (activeTask != null) {
-                            item {
-                                val containerColor = when (activeTask.current.sessionType()) {
-                                    SessionType.Focus -> {
-                                        if (focusTimeColor == null || focusTimeColor == 0L) {
-                                            Color(SessionColor)
-                                        } else {
-                                            Color(
-                                                focusTimeColor,
-                                            )
-                                        }
-                                    }
-
-                                    SessionType.LongBreak -> {
-                                        if (longBreakColor == null || longBreakColor == 0L) {
-                                            Color(LongBreakColor)
-                                        } else {
-                                            Color(
-                                                longBreakColor,
-                                            )
-                                        }
-                                    }
-
-                                    SessionType.ShortBreak -> {
-                                        if (shortBreakColor == null || shortBreakColor == 0L) {
-                                            Color(ShortBreakColor)
-                                        } else {
-                                            Color(
-                                                shortBreakColor,
-                                            )
-                                        }
-                                    }
-                                }
-                                ActiveTaskCard(
-                                    task = activeTask,
-                                    onClick = onClickTask,
-                                    containerColor = containerColor,
-                                    onClickTaskOptions = onClickActiveTaskOptions,
-                                    timerState = timerState,
-                                    tickingTime = tickingTime,
-                                )
-                            }
-                        }
-
-                        item {
-                            Text(
-                                text = "Hello, ${username.pickFirstName()}!",
-                                style = MaterialTheme.typography.displaySmall,
-                            )
-                        }
-
-                        item {
-                            MyPropertySummary(tasks)
-                        }
 
 
-                        item {
+   @OptIn(ExperimentalMaterialApi::class)
+   @Composable
+   private fun HomeScreenContent(
+       tasksState: TasksState,
+       timerState: TimerState,
+       selectedStateOfN: String,
+       tickingTime: Long,
+       hourFormat: Int,
+       sessionTime: Int,
+       shortBreakTime: Int,
+       longBreakTime: Int,
+       username: String,
+       propertiesState: Any,
+       onClickTask: (task: Task) -> Unit,
+       onClickSeeAllTasks: (type: String) -> Unit,
+       onClickTaskOptions: (task: Task) -> Unit,
+       focusTimeColor: Long?,
+       shortBreakColor: Long?,
+       longBreakColor: Long?,
+       onClickActiveTaskOptions: (task: Task) -> Unit,
+       onClickAddTask: () -> Unit,
+       onClickSearchProperties: () -> Unit
+   ) {
 
 
-                            ChipsPropertyType(
-                                modifier = Modifier.fillMaxWidth(),
-                                selectedOption = {
-                                    TextFieldState(selectedStateOfN)
-                                },
-                                onOptionSelected = {
-                                    //onSelectedTaskTypeChange
-                                },
-                                textStyle = MaterialTheme.typography.titleSmall.copy(
-                                    fontSize = 16.sp,
-                                ),
-                            )
+
+       Scaffold { paddingValues ->
+           Box(
+               modifier = Modifier
+                   .padding(paddingValues)
+                   .fillMaxSize(),
+           ) {
+
+               when (propertiesState) {
+
+                   PropertiesState.Loading -> {
+                       println("ABC properties Failing = ")
+                   }
+
+                  is PropertiesState.Success -> {
+                      val properties =
+                          propertiesState.propertyList.sortedByDescending { it.idProp }
+                      println("ABC properties = " + properties.size)
+                      val pictures = SnapshotStateList<PictureData>()
+                      println("ABC pictures = " + pictures.size)
+                      Column( ) {
+
+                          Text(
+                              text = "Hello, ${username.pickFirstName()}!",
+                              style = MaterialTheme.typography.displaySmall,
+                          )
+
+                          MyPropertySummary()
 
 
-                            ChipsPropertyUse(
-                                modifier = Modifier.fillMaxWidth(),
-                                selectedOption = {
-                                    TextFieldState(selectedStateOfN)
-                                },
-                                onOptionSelected = {
-                                    //onSelectedTaskTypeChange
-                                },
-                                textStyle = MaterialTheme.typography.titleSmall.copy(
-                                    fontSize = 16.sp,
-                                ),
-                            )
-                        }
+
+                          val statesOfN: List<String> = listOf("Lagos", "Oyo", "Ogun")
+                          BloomDropDown(
+                              label = {
+                                  Text(
+                                      text = "State",
+                                      style = MaterialTheme.typography.titleSmall.copy(
+                                          fontWeight = FontWeight.SemiBold,
+                                          fontSize = 16.sp,
+                                      ),
+                                  )
+                              },
+                              modifier = Modifier.fillMaxWidth(),
+                              options = statesOfN,
+                              selectedOption = {
+                                  TextFieldState(selectedStateOfN)
+                              },
+                              onOptionSelected = {
+                                  //onSelectedTaskTypeChange
+                              },
+                              textStyle = MaterialTheme.typography.titleSmall.copy(
+                                  fontSize = 16.sp,
+                              ),
+                          )
 
 
-                        item {
+                          LazyColumn(
+                              contentPadding = PaddingValues(horizontal = 16.dp),
+                              verticalArrangement = Arrangement.spacedBy(8.dp),
+                          ) {
 
-                          /*  var selectedIndex by remember { mutableStateOf(-1) }
-                            LargeDropdownMenu(
-                                label = "States",
-                                items = listOf("Lagos", "Oyo", "Ogun"),
-                                selectedIndex = selectedIndex,
-                                onItemSelected = { index, _ -> selectedIndex = index },
-                            )*/
-                            var taskOptions: List<String> = listOf("Lagos", "Oyo", "Ogun")
-                            BloomDropDown(
-                                label = {
-                                    Text(
-                                        text = "State",
-                                        style = MaterialTheme.typography.titleSmall.copy(
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 16.sp,
-                                        ),
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                options = taskOptions,
-                                selectedOption = {
-                                    TextFieldState(selectedStateOfN)
-                                },
-                                onOptionSelected = {
-                                    //onSelectedTaskTypeChange
-                                },
-                                textStyle = MaterialTheme.typography.titleSmall.copy(
-                                    fontSize = 16.sp,
-                                ),
-                            )
-                        }
+                              item {
 
-                        if (overdueTasks.isNotEmpty()) {
-                            item {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(
-                                        text = "Overdue Tasks (${overdueTasks.size})",
-                                        style = MaterialTheme.typography.titleLarge.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.error,
-                                        ),
-                                    )
-                                    if (overdueTasks.size > 3) {
-                                        Text(
-                                            modifier = Modifier.clickable {
-                                                onClickSeeAllTasks("overdue")
-                                            },
-                                            text = "See All",
-                                            style = MaterialTheme.typography.labelLarge.copy(
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = MaterialTheme.colorScheme.error,
-                                                fontSize = 16.sp,
-                                            ),
-                                        )
-                                    }
-                                }
-                            }
+                                  ChipsPropertyType(
+                                      modifier = Modifier.fillMaxWidth(),
+                                      selectedOption = {
+                                          TextFieldState(selectedStateOfN)
+                                      },
+                                      onOptionSelected = {
+                                          //onSelectedTaskTypeChange
+                                      },
+                                      textStyle = MaterialTheme.typography.titleSmall.copy(
+                                          fontSize = 16.sp,
+                                      ),
+                                  )
 
-                            items(
-                                items = tasksState.overdueTasks.take(3),
-                                key = { it.id },
-                            ) {
-                                TaskCard(
-                                    type = "overdue",
-                                    task = it,
-                                    onClick = onClickTask,
-                                    onShowTaskOption = onClickTaskOptions,
-                                    hourFormat = hourFormat,
-                                    focusSessions = it.focusSessions,
-                                    sessionTime = sessionTime,
-                                    shortBreakTime = shortBreakTime,
-                                    longBreakTime = longBreakTime,
-                                )
-                            }
-                        }
+                                  ChipsPropertyUse(
+                                      modifier = Modifier.fillMaxWidth(),
+                                      selectedOption = {
+                                          TextFieldState(selectedStateOfN)
+                                      },
+                                      onOptionSelected = {
+                                          //onSelectedTaskTypeChange
+                                      },
+                                      textStyle = MaterialTheme.typography.titleSmall.copy(
+                                          fontSize = 16.sp,
+                                      ),
+                                  )
+                              }
 
-                        if (tasks.isNotEmpty()) {
+
+                              items(
+                                  items = properties.take(5),
+                                  key = { it.idProp },
+                              ) {
+                                  PropertyCard(
+                                      type = "overdue",
+                                      property = it,
+                                      onClick = onClickTask,
+                                      pictures = pictures
+                                  )
+                              }
+                          }
+                      }
+                  }
+               }
+
+               /*
+               when (tasksState) {
+                   TasksState.Loading -> {
+                       CircularProgressIndicator(
+                           modifier = Modifier.align(Alignment.Center),
+                       )
+                   }
+
+                   is TasksState.Success -> {
+                       val tasks = tasksState.tasks.sortedByDescending { it.completed.not() }
+                       val overdueTasks = tasksState.overdueTasks
+                       val activeTask = tasks.firstOrNull { it.active }
+
+                       LazyColumn(
+                           contentPadding = PaddingValues(horizontal = 16.dp),
+                           verticalArrangement = Arrangement.spacedBy(8.dp),
+                       ) {
+                           if (activeTask != null) {
+                               item {
+                                   val containerColor = when (activeTask.current.sessionType()) {
+                                       SessionType.Focus -> {
+                                           if (focusTimeColor == null || focusTimeColor == 0L) {
+                                               Color(SessionColor)
+                                           } else {
+                                               Color(
+                                                   focusTimeColor,
+                                               )
+                                           }
+                                       }
+
+                                       SessionType.LongBreak -> {
+                                           if (longBreakColor == null || longBreakColor == 0L) {
+                                               Color(LongBreakColor)
+                                           } else {
+                                               Color(
+                                                   longBreakColor,
+                                               )
+                                           }
+                                       }
+
+                                       SessionType.ShortBreak -> {
+                                           if (shortBreakColor == null || shortBreakColor == 0L) {
+                                               Color(ShortBreakColor)
+                                           } else {
+                                               Color(
+                                                   shortBreakColor,
+                                               )
+                                           }
+                                       }
+                                   }
+                                   ActiveTaskCard(
+                                       task = activeTask,
+                                       onClick = onClickTask,
+                                       containerColor = containerColor,
+                                       onClickTaskOptions = onClickActiveTaskOptions,
+                                       timerState = timerState,
+                                       tickingTime = tickingTime,
+                                   )
+                               }
+                           }
+
+                           item {
+                               Text(
+                                   text = "Hello, ${username.pickFirstName()}!",
+                                   style = MaterialTheme.typography.displaySmall,
+                               )
+                           }
+
+                           item {
+                               MyPropertySummary(tasks)
+                           }
+
+
+                           item {
+
+                               ChipsPropertyType(
+                                   modifier = Modifier.fillMaxWidth(),
+                                   selectedOption = {
+                                       TextFieldState(selectedStateOfN)
+                                   },
+                                   onOptionSelected = {
+                                       //onSelectedTaskTypeChange
+                                   },
+                                   textStyle = MaterialTheme.typography.titleSmall.copy(
+                                       fontSize = 16.sp,
+                                   ),
+                               )
+
+                               ChipsPropertyUse(
+                                   modifier = Modifier.fillMaxWidth(),
+                                   selectedOption = {
+                                       TextFieldState(selectedStateOfN)
+                                   },
+                                   onOptionSelected = {
+                                       //onSelectedTaskTypeChange
+                                   },
+                                   textStyle = MaterialTheme.typography.titleSmall.copy(
+                                       fontSize = 16.sp,
+                                   ),
+                               )
+                           }
+
+
+                           item {
+
+                               val statesOfN: List<String> = listOf("Lagos", "Oyo", "Ogun")
+                               BloomDropDown(
+                                   label = {
+                                       Text(
+                                           text = "State",
+                                           style = MaterialTheme.typography.titleSmall.copy(
+                                               fontWeight = FontWeight.SemiBold,
+                                               fontSize = 16.sp,
+                                           ),
+                                       )
+                                   },
+                                   modifier = Modifier.fillMaxWidth(),
+                                   options = statesOfN,
+                                   selectedOption = {
+                                       TextFieldState(selectedStateOfN)
+                                   },
+                                   onOptionSelected = {
+                                       //onSelectedTaskTypeChange
+                                   },
+                                   textStyle = MaterialTheme.typography.titleSmall.copy(
+                                       fontSize = 16.sp,
+                                   ),
+                               )
+                           }
+
+                           /*if (tasks.isNotEmpty()) {
                             item {
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Row(
@@ -469,43 +517,72 @@ private fun HomeScreenContent(
                                     }
                                 }
                             }
-                        }
+                        }*/
 
-                        if (tasks.all { it.completed }.not()) {
-                            items(
-                                items = tasks.take(3),
-                                key = { it.id },
-                            ) {
-                                TaskCard(
-                                    type = "today",
-                                    task = it,
-                                    onClick = onClickTask,
-                                    onShowTaskOption = onClickTaskOptions,
-                                    hourFormat = hourFormat,
-                                    focusSessions = it.focusSessions,
-                                    sessionTime = sessionTime,
-                                    shortBreakTime = shortBreakTime,
-                                    longBreakTime = longBreakTime,
-                                )
-                            }
-                        }
+                           if (tasks.all { it.completed }.not()) {
+                               items(
+                                   items = tasks.take(3),
+                                   key = { it.id },
+                               ) {
+                                   TaskCard(
+                                       type = "today",
+                                       task = it,
+                                       onClick = onClickTask,
+                                       onShowTaskOption = onClickTaskOptions,
+                                       hourFormat = hourFormat,
+                                       focusSessions = it.focusSessions,
+                                       sessionTime = sessionTime,
+                                       shortBreakTime = shortBreakTime,
+                                       longBreakTime = longBreakTime,
+                                   )
+                               }
+                           }
 
 
-                        if ((tasks.all { it.completed } || tasks.isEmpty()) && overdueTasks.isEmpty()) {
-                            item {
-                                StartOrCompletedTaskComponent(
-                                    tasks = tasks,
-                                    onClickAddTask = onClickAddTask,
-                                    onClickSearchProperties = onClickSearchProperties
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                           if (tasks.all { it.completed }.not()) {
+                               items(
+                                   items = tasks.take(3),
+                                   key = { it.id },
+                               ) {
+                                   TaskCard(
+                                       type = "today",
+                                       task = it,
+                                       onClick = onClickTask,
+                                       onShowTaskOption = onClickTaskOptions,
+                                       hourFormat = hourFormat,
+                                       focusSessions = it.focusSessions,
+                                       sessionTime = sessionTime,
+                                       shortBreakTime = shortBreakTime,
+                                       longBreakTime = longBreakTime,
+                                   )
+                               }
+                           }
+
+
+                           /*if ((tasks.all { it.completed } || tasks.isEmpty()) && overdueTasks.isEmpty()) {
+                               item {
+                                   StartOrCompletedTaskComponent(
+                                       tasks = tasks,
+                                       onClickAddTask = onClickAddTask,
+                                       onClickSearchProperties = onClickSearchProperties
+                                   )
+                               }
+                           }*/
+
+                       }
+
+                   }
+
+
+               }
+*/
+
+           }
+
     }
 }
+
+
 
 @Composable
 private fun StartOrCompletedTaskComponent(
@@ -722,18 +799,19 @@ private fun TodayTaskProgressCard(tasks: List<Task>) {
 
 
 @Composable
-private fun MyPropertySummary(tasks: List<Task>) {
+private fun MyPropertySummary() {
     Card {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(8.dp)
+                .height(80.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             PropertyPublishProgress(
                 mainColor = MaterialTheme.colorScheme.primary,
-                percentage = taskCompletionPercentage(tasks).toFloat(),
+                percentage = 8F,
                 counterColor = MaterialTheme.colorScheme.onSurface,
             )
 
@@ -741,12 +819,12 @@ private fun MyPropertySummary(tasks: List<Task>) {
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = myPropertySummaryTest(tasks),
+                    text = myPropertySummaryTest(),
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                     ),
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "Try publishing to make a commission",
                     style = MaterialTheme.typography.labelMedium.copy(

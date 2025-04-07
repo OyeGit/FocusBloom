@@ -13,3 +13,4 @@ rootProject.name = "FocusBloom"
 include(":android")
 include(":desktop")
 include(":shared")
+include(":server")

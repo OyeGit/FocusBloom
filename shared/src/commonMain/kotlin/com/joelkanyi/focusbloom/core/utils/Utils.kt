@@ -305,10 +305,10 @@ fun taskCompleteMessage(tasks: List<Task>): String {
     }
 }
 
-fun myPropertySummaryTest(tasks: List<Task>): String {
-    val completedTasks = tasks.filter { it.completed }.size
+fun myPropertySummaryTest(): String {
+    val completedTasks = 3
     return if (completedTasks != 0) {
-        "Congrats! You've completed all your tasks for today"
+        "You've not published any properties"
     } else {
         "You've not published any properties"
     }

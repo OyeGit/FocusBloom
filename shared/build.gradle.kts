@@ -82,9 +82,14 @@ kotlin {
             implementation(compose.materialIconsExtended)
 
             implementation(compose.components.resources)
+            implementation(libs.ktor.client.cio)
 
             implementation(libs.kotlinX.serializationJson)
 //            implementation(libs.androidx.compose.ui)
+
+            implementation("io.ktor:ktor-client-core:3.0.1")
+            implementation("io.ktor:ktor-client-content-negotiation:3.0.1")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.1")
 
             implementation(libs.material3.window.size.multiplatform)
 
@@ -108,6 +113,8 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.android.driver)
+
+            implementation("io.ktor:ktor-client-android:3.0.1")
 
             implementation(libs.accompanist.systemUIController)
             implementation(libs.core)
@@ -139,6 +146,7 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.native.driver)
 
+            implementation("io.ktor:ktor-client-darwin:3.0.1")
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)        }
     }
