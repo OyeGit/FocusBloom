@@ -47,8 +47,21 @@ kotlin {
 
     jvm()
 
-    iosArm64()
-    iosSimulatorArm64()
+    js {
+        browser()
+        useEsModules()
+    }
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
 
     cocoapods {
         version = "1.0"
@@ -148,7 +161,20 @@ kotlin {
 
             implementation("io.ktor:ktor-client-darwin:3.0.1")
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-            implementation(compose.components.resources)        }
+            implementation(compose.components.resources)
+        }
+
+        val jsWasmMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(npm("uuid", "^9.0.1"))
+            }
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
     }
 }
 dependencies {

@@ -95,7 +95,7 @@ fun ChipsPropertyUse(
                 androidx.compose.material3.Text("Commercial")
             }
 
-            Chip(
+         /*   Chip(
                 onClick = {
                     println("Chip Clicked...!")
                 },
@@ -115,7 +115,7 @@ fun ChipsPropertyUse(
                     )
                 }) {
                 androidx.compose.material3.Text("Agric")
-            }
+            }*/
 
           /*  Chip(
                 onClick = {

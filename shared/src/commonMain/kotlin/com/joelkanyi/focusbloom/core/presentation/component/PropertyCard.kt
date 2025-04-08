@@ -39,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,6 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.key.Key.Companion.R
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -61,12 +64,17 @@ import com.joelkanyi.focusbloom.core.utils.durationInMinutes
 import com.joelkanyi.focusbloom.core.utils.prettyFormat
 import com.joelkanyi.focusbloom.core.utils.prettyTimeDifference
 import com.joelkanyi.focusbloom.resource.PictureData
+import com.joelkanyi.focusbloom.resource.resourcePictures
 import focusbloom.shared.generated.resources.Res
 import focusbloom.shared.generated.resources.ic_complete
 import focusbloom.shared.generated.resources.il_completed
 import focusbloom.shared.generated.resources.il_empty
+import focusbloom.shared.generated.resources.personal
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -84,18 +92,22 @@ fun PropertyCard(
             // onClick(task)
         },
     ) {
+        val v_pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
        // pictures: SnapshotStateList<PictureData>
+        println( "AAA - pictures"+ v_pictures.size )
         Row() {
-            Column() {
+            Column(modifier = Modifier
+                .size(140.dp) ) {
+
+
                 Image(
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(140.dp)
                         .align(CenterHorizontally),
-                    painter = painterResource(  Res.drawable.il_empty),
+                    painter = painterResource(  Res.drawable.il_empty ) ,
                     contentDescription = null,
                 )
             }
-
 
             Column(
                 modifier = Modifier

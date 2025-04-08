@@ -250,8 +250,6 @@ fun HomeScreen(
        onClickSearchProperties: () -> Unit
    ) {
 
-
-
        Scaffold { paddingValues ->
            Box(
                modifier = Modifier
@@ -280,32 +278,34 @@ fun HomeScreen(
 
                           MyPropertySummary()
 
-
-
                           val statesOfN: List<String> = listOf("Lagos", "Oyo", "Ogun")
-                          BloomDropDown(
-                              label = {
-                                  Text(
-                                      text = "State",
-                                      style = MaterialTheme.typography.titleSmall.copy(
-                                          fontWeight = FontWeight.SemiBold,
-                                          fontSize = 16.sp,
-                                      ),
-                                  )
-                              },
-                              modifier = Modifier.fillMaxWidth(),
-                              options = statesOfN,
-                              selectedOption = {
-                                  TextFieldState(selectedStateOfN)
-                              },
-                              onOptionSelected = {
-                                  //onSelectedTaskTypeChange
-                              },
-                              textStyle = MaterialTheme.typography.titleSmall.copy(
-                                  fontSize = 16.sp,
-                              ),
-                          )
 
+                          Row() {
+
+                              BloomDropDown(
+                                  label = {
+                                      Text(
+                                          text = "State",
+                                          style = MaterialTheme.typography.titleSmall.copy(
+                                              fontWeight = FontWeight.SemiBold,
+                                              fontSize = 16.sp,
+                                          ),
+                                      )
+                                  },
+                                  modifier = Modifier.fillMaxWidth(),
+                                  options = statesOfN,
+                                  selectedOption = {
+                                      TextFieldState(selectedStateOfN)
+                                  },
+                                  onOptionSelected = {
+                                      //onSelectedTaskTypeChange
+                                  },
+                                  textStyle = MaterialTheme.typography.titleSmall.copy(
+                                      fontSize = 16.sp,
+                                  ),
+                              )
+
+                          }
 
                           LazyColumn(
                               contentPadding = PaddingValues(horizontal = 16.dp),

@@ -1,4 +1,8 @@
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.CanvasBasedWindow
 import org.jetbrains.skiko.wasm.onWasmReady
 
@@ -6,7 +10,9 @@ import org.jetbrains.skiko.wasm.onWasmReady
 fun main() {
     onWasmReady {
         CanvasBasedWindow("ImageViewer") {
-            ImageViewerWeb()
+            Surface(modifier = Modifier.fillMaxSize()) {
+                Text(text = "Welcome to my Project")
+            }
         }
     }
 }

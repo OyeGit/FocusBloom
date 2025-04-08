@@ -12,7 +12,7 @@ val rootDirPath = project.rootDir.path
 
 kotlin {
     js {
-        moduleName = "imageviewer"
+        moduleName = "focusbloom"
         browser {
             commonWebpackConfig {
                 outputFileName = "imageviewer.js"

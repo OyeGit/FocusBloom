@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -62,11 +63,14 @@ fun <T> BloomDropDown(
     Column {
         if (label != null) {
             label()
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier
+                .height(4.dp)
+                .width(180.dp))
         }
         Box(
             modifier = modifier
                 .height(42.dp)
+                .width(180.dp)
                 .padding(start=12.dp, end=12.dp)
                 // .menuAnchor()
                 .border(
