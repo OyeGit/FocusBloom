@@ -58,6 +58,7 @@ class PreferenceManager constructor(private val settings: Settings) {
     companion object {
         const val NOTIFICATION_OPTION = "notification_option_key"
         const val USERNAME = "username_key"
+        const val FIRSTNAME = "firstname_key"
         const val SHORT_BREAK_COLOR = "short_break_color_key"
         const val LONG_BREAK_COLOR = "long_break_color_key"
         const val FOCUS_COLOR = "focus_color_key"

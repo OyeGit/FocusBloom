@@ -15,6 +15,7 @@
  */
 package com.joelkanyi.focusbloom.core.domain.repository.settings
 
+import com.joelkanyi.focusbloom.client.User
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
@@ -36,8 +37,11 @@ interface SettingsRepository {
     fun focusColor(): Flow<Long?>
     fun saveFocusColor(color: Long)
     fun saveUsername(value: String)
+    fun saveFirstname(value: String)
+    suspend fun loginUsernamePassword(email: String, password: String ): User?
     fun saveUsernamePassword(username: String, password: String)
     fun getUsername(): Flow<String?>
+    fun getFirstname(): Flow<String?>
     fun remindersOn(): Flow<Int?>
     fun toggleReminder(value: Int)
 }

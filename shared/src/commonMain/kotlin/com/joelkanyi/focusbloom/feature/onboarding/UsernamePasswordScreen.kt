@@ -16,12 +16,17 @@
 package com.joelkanyi.focusbloom.feature.onboarding
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
@@ -43,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -55,16 +62,26 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.joelkanyi.focusbloom.core.presentation.navigation.Destinations
 import com.joelkanyi.focusbloom.core.utils.UiEvents
 import com.joelkanyi.focusbloom.core.utils.koinViewModel
+import com.joelkanyi.focusbloom.view.component.SimpleImageButton
+import com.joelkanyi.focusbloom.view.component.Spacer_12dp
+import com.joelkanyi.focusbloom.view.component.Spacer_32dp
+import com.joelkanyi.focusbloom.view.component.Spacer_4dp
+import focusbloom.shared.generated.resources.Res
+import focusbloom.shared.generated.resources.ic_complete
+import focusbloom.shared.generated.resources.ic_work
+import focusbloom.shared.generated.resources.il_tasks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -116,6 +133,71 @@ fun UsernameScreen(
 }
 
 @Composable
+fun signInWith () {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding( top=28.dp )
+
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                "forgot password?",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline,
+                fontSize = 12.sp
+            )
+        }
+
+        Spacer_32dp()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            HorizontalDivider(modifier = Modifier.width(75.dp))
+            Text(text = "Or sign in with")
+            HorizontalDivider(modifier = Modifier.width(75.dp))
+        }
+
+        Spacer_12dp()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            SimpleImageButton(Res.drawable.il_tasks)
+            SimpleImageButton(Res.drawable.il_tasks)
+            SimpleImageButton(Res.drawable.il_tasks)
+        }
+        Spacer_12dp()
+        Row(   modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+            ) {
+            Text(
+                text = "Don't have an account? ",
+            )
+            Spacer_4dp()
+            Text(
+                modifier = Modifier.clickable {
+                    //navigateToRegister()
+                },
+                text = "Sign up",
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        }
+
+    }
+}
+@Composable
 fun UsernameScreenContent(
     username: String,
     password: String,
@@ -126,7 +208,7 @@ fun UsernameScreenContent(
 ) {
     LazyColumn(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(start=12.dp, end = 12.dp, top = 12.dp)
             .fillMaxSize(),
     ) {
         item {
@@ -137,11 +219,11 @@ fun UsernameScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(56.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = "What's your username?",
+                text = "What's your email address?",
                 style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 18.sp,
+                    fontSize = 14.sp,
                 ),
             )
         }
@@ -166,11 +248,11 @@ fun UsernameScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(56.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = "What's your password?",
                 style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 18.sp,
+                    fontSize = 14.sp,
                 ),
             )
         }
@@ -194,15 +276,19 @@ fun UsernameScreenContent(
         }
 
         item {
+            signInWith()
+        }
+
+        item {
             AnimatedVisibility(
                 username.isNotEmpty(),
             ) {
                 Column {
-                    Spacer(modifier = Modifier.height(56.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .height(48.dp),
                         shape = MaterialTheme.shapes.medium,
                         onClick = onClickContinue,
                     ) {
@@ -267,7 +353,6 @@ private fun UsernameTextField(
     )
 }
 
-
 @Composable
 private fun PasswordTextField(
     modifier: Modifier,
@@ -288,7 +373,7 @@ private fun PasswordTextField(
                 text = "Password",
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.ExtraLight,
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     letterSpacing = -(1.6).sp,
                     lineHeight = 32.sp,
                 ),
@@ -304,7 +389,7 @@ private fun PasswordTextField(
         ),
         textStyle = MaterialTheme.typography.labelLarge.copy(
             fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
+            fontSize = 16.sp,
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done,

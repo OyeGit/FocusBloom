@@ -2,6 +2,7 @@ package com.joelkanyi.focusbloom
 
 actual object AppLogger {
     actual fun e(tag: String, message: String, throwable: Throwable?) {
+        // TODO:
     }
 
     actual fun d(tag: String, message: String) {

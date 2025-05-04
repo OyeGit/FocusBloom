@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.nativeCocoapod) apply false
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.spotless)
-    id("dev.iurysouza.modulegraph") version "0.10.1"
+    id("dev.iurysouza.modulegraph") version "0.12.0"
     alias(libs.plugins.compose.compiler) apply false
 }
 
@@ -23,9 +23,7 @@ allprojects {
         maven(url = "https://jitpack.io")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
-
 }
-
 
 subprojects {
     apply(plugin = "com.diffplug.spotless")

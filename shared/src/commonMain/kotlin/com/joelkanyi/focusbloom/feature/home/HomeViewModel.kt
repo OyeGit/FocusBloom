@@ -15,8 +15,10 @@
  */
 package com.joelkanyi.focusbloom.feature.home
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.joelkanyi.focusbloom.client.Client
 import com.joelkanyi.focusbloom.core.domain.model.Property
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import com.joelkanyi.focusbloom.core.domain.repository.properties.PropertiesRepository
@@ -41,6 +43,8 @@ class HomeViewModel(
 ) : ViewModel() {
     private val _openBottomSheet = MutableStateFlow(false)
     val openBottomSheet = _openBottomSheet.asStateFlow()
+
+    val client: Client = Client()
 
     val queryParam =hashMapOf<String, Any?>()
 
@@ -183,6 +187,14 @@ class HomeViewModel(
     }
 
     val username = settingsRepository.getUsername()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null,
+        )
+
+    val firstname = settingsRepository.getFirstname()
         .map { it }
         .stateIn(
             scope = viewModelScope,

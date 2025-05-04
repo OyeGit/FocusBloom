@@ -22,7 +22,7 @@ plugins {
 
 android {
     namespace = "com.joelkanyi.focusbloom.android"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.joelkanyi.focusbloom.android"
@@ -68,4 +68,5 @@ dependencies {
     implementation(libs.compose.activity)
     implementation(libs.koin.android)
     coreLibraryDesugaring(libs.core.library.desugaring)
+    implementation(libs.kotlinx.coroutines.android)
 }

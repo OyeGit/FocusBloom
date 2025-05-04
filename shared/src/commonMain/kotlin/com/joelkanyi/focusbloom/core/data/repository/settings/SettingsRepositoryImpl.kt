@@ -15,10 +15,16 @@
  */
 package com.joelkanyi.focusbloom.core.data.repository.settings
 
+import androidx.compose.runtime.LaunchedEffect
 import com.joelkanyi.focusbloom.AppLogger
+import com.joelkanyi.focusbloom.client.User
 import com.joelkanyi.focusbloom.core.data.local.setting.PreferenceManager
 import com.joelkanyi.focusbloom.core.domain.repository.settings.SettingsRepository
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.Json
 
 private val tag = SettingsRepositoryImpl::class.qualifiedName.toString()
 
@@ -98,13 +104,38 @@ class SettingsRepositoryImpl(
         preferenceManager.setString(key = PreferenceManager.USERNAME, value = value)
     }
 
+    override fun saveFirstname(value: String)  {
+        preferenceManager.setString(key = PreferenceManager.FIRSTNAME, value = value)
+    }
+
+    override suspend fun loginUsernamePassword(email: String, password: String): User? {
+        val client = HttpClient()
+        val response = client.get("http://37.148.204.80:8080/byLogin/"+email)
+        println( "AAB - "+response.bodyAsText()   )
+        return convertJsonToObject( response.bodyAsText() )
+    }
+
     override fun saveUsernamePassword(username: String, password: String) {
         preferenceManager.setString(key = PreferenceManager.USERNAME, value = username)
         AppLogger.i( tag, "saveUsernamePassword() - username = "+username )
     }
 
+    private fun convertJsonToObject(jsonString: String): User ? {
+        return try {
+            Json.decodeFromString<User>(jsonString)
+        } catch (e: Exception) {
+            // Handle parsing errors, e.g., invalid JSON format
+            println("Error decoding JSON: ${e.message}")
+            null
+        }
+    }
+
     override fun getUsername(): Flow<String?> {
         return preferenceManager.getString(key = PreferenceManager.USERNAME)
+    }
+
+    override fun getFirstname(): Flow<String?> {
+        return preferenceManager.getString(key = PreferenceManager.FIRSTNAME)
     }
 
     override fun remindersOn(): Flow<Int?> {
@@ -114,4 +145,8 @@ class SettingsRepositoryImpl(
     override fun toggleReminder(value: Int) {
         preferenceManager.setInt(key = PreferenceManager.NOTIFICATION_OPTION, value = value)
     }
+
+    data class loggedInUser (
+        val user: User
+    )
 }

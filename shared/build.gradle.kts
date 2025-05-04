@@ -47,6 +47,8 @@ kotlin {
 
     jvm()
 
+
+
     js {
         browser()
         useEsModules()
@@ -90,6 +92,7 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.koin.compose)
 
+            implementation(libs.ktor.client.core)
             implementation(compose.material3)
             implementation(compose.material)
             implementation(compose.materialIconsExtended)
@@ -122,12 +125,17 @@ kotlin {
 
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.navigation.compose)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.kotlinx.coroutines.core)
         }
 
         androidMain.dependencies {
             implementation(libs.android.driver)
 
-            implementation("io.ktor:ktor-client-android:3.0.1")
+            implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.ktor.client.android)
 
             implementation(libs.accompanist.systemUIController)
             implementation(libs.core)
@@ -159,6 +167,7 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.native.driver)
 
+            implementation(libs.ktor.client.darwin)
             implementation("io.ktor:ktor-client-darwin:3.0.1")
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)

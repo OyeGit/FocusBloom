@@ -108,6 +108,7 @@ fun HomeScreen(
     val tasksState = viewModel.tasks.collectAsState().value
     val propertiesState = viewModel.properties.collectAsState().value
     val username = viewModel.username.collectAsState().value ?: ""
+    val firstname = viewModel.firstname.collectAsState().value ?: ""
     val hourFormat = viewModel.hourFormat.collectAsState().value
     val sessionTime = viewModel.sessionTime.collectAsState().value ?: 25
     val shortBreakTime = viewModel.shortBreakTime.collectAsState().value ?: 5
@@ -184,6 +185,7 @@ fun HomeScreen(
         shortBreakTime = shortBreakTime,
         longBreakTime = longBreakTime,
         username = username,
+        firstname = firstname,
         propertiesState = propertiesState,
         onClickTask = {
             if (it.date.date < today().date) {
@@ -221,10 +223,7 @@ fun HomeScreen(
         } ,
 
     )
-
 }
-
-
 
    @OptIn(ExperimentalMaterialApi::class)
    @Composable
@@ -238,6 +237,7 @@ fun HomeScreen(
        shortBreakTime: Int,
        longBreakTime: Int,
        username: String,
+       firstname: String,
        propertiesState: Any,
        onClickTask: (task: Task) -> Unit,
        onClickSeeAllTasks: (type: String) -> Unit,
@@ -272,7 +272,7 @@ fun HomeScreen(
                       Column( ) {
 
                           Text(
-                              text = "Hello, ${username.pickFirstName()}!",
+                              text = "Hi, ${firstname}!",
                               style = MaterialTheme.typography.displaySmall,
                           )
 

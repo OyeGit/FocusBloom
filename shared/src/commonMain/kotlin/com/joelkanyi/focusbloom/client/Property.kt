@@ -10,14 +10,14 @@ data class Property (
     val address: String,
     val latitude: Double,
     val longitude: Double,
-    val lGA:String,
-    val city:String,
-    val stateofN: String,
-    val title: String,       //   Title
+    val lGA:Int,
+    val city:Int,
+    val stateofN: Int,
+    val title: String,    //   Title
     val description: String,
-    val propType: String,    // * Rental, Sale, Lease
-    val propUse: String,     // * Residential, Commercial, Agriculture, Industry
-    val propSubtype: String, // * Apartment, Flat, House, Shop, Commercial, Farm
+    val propType: Int,    // * Rental, Sale, Lease
+    val propUse: Int,     // * Residential, Commercial, Agriculture, Industry
+    val propSubtype: Int, // * Apartment, Flat, House, Shop, Commercial, Farm
     val bedroom: Int,
     val toilets: Int,
     val parking: Int,
@@ -29,8 +29,8 @@ data class Property (
     val marketedBy: Int,
     val marketedByPhone: String,
     val marketedByEmail: String,
+    val marketedByImage: String,
     val status: Int,
-    val active: Boolean,
     val img0: String,
     val img1: String,
     val img2: String,
@@ -43,7 +43,7 @@ data class Property (
     val img9: String,
     val video1: String,
     val video2: String,
-    val marketedByImage: String,
+
 
 )
 
