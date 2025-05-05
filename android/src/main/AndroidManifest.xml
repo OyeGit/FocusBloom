@@ -9,6 +9,7 @@
         android:label="@string/focusbloom"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/AppTheme"
         tools:targetApi="m">
         <activity

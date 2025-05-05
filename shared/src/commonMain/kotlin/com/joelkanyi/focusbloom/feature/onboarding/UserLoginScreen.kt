@@ -1,0 +1,480 @@
+/*
+ * Copyright 2023 Joel Kanyi.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.joelkanyi.focusbloom.feature.onboarding
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.joelkanyi.focusbloom.core.presentation.navigation.Destinations
+import com.joelkanyi.focusbloom.core.utils.UiEvents
+import com.joelkanyi.focusbloom.core.utils.koinViewModel
+import com.joelkanyi.focusbloom.view.component.SimpleImageButton
+import com.joelkanyi.focusbloom.view.component.Spacer_12dp
+import com.joelkanyi.focusbloom.view.component.Spacer_32dp
+import com.joelkanyi.focusbloom.view.component.Spacer_4dp
+import focusbloom.shared.generated.resources.Res
+import focusbloom.shared.generated.resources.il_tasks
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+
+@Composable
+fun UserLoginScreen(
+    navController: NavController,
+) {
+    val viewModel = koinViewModel<OnboardingViewModel>()
+    val username = viewModel.username.collectAsState().value
+    val password = viewModel.password.collectAsState().value
+    var showPassword by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(showPassword) {
+        if (showPassword) {
+            delay(2000)
+            showPassword = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.Main.immediate) {
+            viewModel.eventsFlow.collect { event ->
+                when (event) {
+                    is UiEvents.Navigation -> {
+                        navController.popBackStack()
+                        navController.navigate(Destinations.Home)
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    UserRegisterScreenContent(
+        username = username,
+        password=password,
+        typeWriterTextParts = viewModel.typeWriterTextParts,
+        onUsernameChange = {
+            viewModel.setUsername(it)
+        },
+        onPasswordChange = {
+            viewModel.setPassword(it)
+        },
+        onClickContinue = {
+            keyboardController?.hide()
+            viewModel.saveUsernamePassword()
+        },
+    )
+}
+
+@Composable
+fun signInRegisterWith () {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding( top=28.dp )
+
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                "forgot password?",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline,
+                fontSize = 12.sp
+            )
+        }
+
+        Spacer_32dp()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            HorizontalDivider(modifier = Modifier.width(75.dp))
+            Text(text = "Or sign in with")
+            HorizontalDivider(modifier = Modifier.width(75.dp))
+        }
+
+        Spacer_12dp()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            SimpleImageButton(Res.drawable.il_tasks)
+            SimpleImageButton(Res.drawable.il_tasks)
+            SimpleImageButton(Res.drawable.il_tasks)
+        }
+        Spacer_12dp()
+        Row(   modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+            ) {
+            Text(
+                text = "Don't have an account? ",
+            )
+            Spacer_4dp()
+            Text(
+                modifier = Modifier.clickable {
+                    //navigateToRegister()
+                },
+                text = "Sign up",
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        }
+
+    }
+}
+@Composable
+fun UserRegisterScreenContent(
+    username: String,
+    password: String,
+    typeWriterTextParts: List<String>,
+    onUsernameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onClickContinue: () -> Unit,
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(start=12.dp, end = 12.dp, top = 12.dp)
+            .fillMaxSize(),
+    ) {
+        item {
+            TypewriterText(
+                baseText = "Naijalist Properties is what you need to",
+                parts = typeWriterTextParts,
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "What's your email address?",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 14.sp,
+                ),
+            )
+        }
+
+        item {
+            val focusRequester = remember { FocusRequester() }
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+            UsernameTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                name = username,
+                onNameChange = {
+                    onUsernameChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "What's your password?",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 14.sp,
+                ),
+            )
+        }
+
+        item {
+            val focusRequester = remember { FocusRequester() }
+            var passwordVisibility: Boolean by remember { mutableStateOf(false) }
+            PasswordTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                name = password,
+                passwordVisibility = passwordVisibility,
+                onNameChange = {
+                    onPasswordChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "What's your firstname",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 14.sp,
+                ),
+            )
+        }
+
+        item {
+            UsernameTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                name = username,
+                onNameChange = {
+                    onUsernameChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "telephone",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 14.sp,
+                ),
+            )
+        }
+
+        item {
+
+            UsernameTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                name = username,
+                onNameChange = {
+                    onUsernameChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            signInRegisterWith()
+        }
+
+        item {
+            AnimatedVisibility(
+                username.isNotEmpty(),
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(48.dp))
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        onClick = onClickContinue,
+                    ) {
+                        Text(
+                            text = "Continue",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UsernameTextField(
+    modifier: Modifier,
+    name: String,
+    onNameChange: (String) -> Unit,
+    onClickDone: () -> Unit,
+) {
+    TextField(
+        modifier = modifier,
+        value = name,
+        onValueChange = onNameChange,
+        maxLines = 1,
+        singleLine = true,
+        placeholder = {
+            Text(
+                text = "John Doe",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.ExtraLight,
+                    fontSize = 18.sp,
+                    letterSpacing = -(1.6).sp,
+                    lineHeight = 32.sp,
+                ),
+            )
+        },
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            disabledIndicatorColor = MaterialTheme.colorScheme.primary,
+        ),
+        textStyle = MaterialTheme.typography.labelLarge.copy(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Text,
+            capitalization = KeyboardCapitalization.Words,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onClickDone()
+            },
+        ),
+    )
+}
+
+@Composable
+private fun PasswordTextField(
+    modifier: Modifier,
+    name: String,
+    onNameChange: (String) -> Unit,
+    onClickDone: () -> Unit,
+    passwordVisibility: Boolean,
+) {
+    TextField(
+        modifier = modifier,
+        value = name,
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        onValueChange = onNameChange,
+        maxLines = 1,
+        singleLine = true,
+        placeholder = {
+            Text(
+                text = "Password",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.ExtraLight,
+                    fontSize = 16.sp,
+                    letterSpacing = -(1.6).sp,
+                    lineHeight = 32.sp,
+                ),
+            )
+        },
+
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            disabledIndicatorColor = MaterialTheme.colorScheme.primary,
+        ),
+        textStyle = MaterialTheme.typography.labelLarge.copy(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+            capitalization = KeyboardCapitalization.None,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onClickDone()
+            },
+        ),
+    )
+}
+
+@Composable
+private fun TypewriterText(modifier: Modifier = Modifier, baseText: String, parts: List<String>) {
+    var partIndex by remember { mutableStateOf(0) }
+    var partText by remember { mutableStateOf("") }
+    val textToDisplay = "$baseText $partText"
+    Text(
+        modifier = modifier,
+        text = textToDisplay,
+        style = MaterialTheme.typography.labelLarge.copy(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 24.sp,
+            letterSpacing = -(1.6).sp,
+            lineHeight = 32.sp,
+        ),
+    )
+
+    LaunchedEffect(key1 = parts) {
+        while (partIndex <= parts.size) {
+            val part = parts[partIndex]
+
+            part.forEachIndexed { charIndex, _ ->
+                partText = part.substring(startIndex = 0, endIndex = charIndex + 1)
+                delay(100)
+            }
+
+            delay(1500)
+
+            part.forEachIndexed { charIndex, _ ->
+                partText = part
+                    .substring(startIndex = 0, endIndex = part.length - (charIndex + 1))
+                delay(30)
+            }
+
+            delay(500)
+
+            partIndex = (partIndex + 1) % parts.size
+        }
+    }
+}

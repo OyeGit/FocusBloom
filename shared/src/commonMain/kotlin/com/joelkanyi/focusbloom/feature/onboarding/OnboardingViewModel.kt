@@ -40,17 +40,29 @@ class OnboardingViewModel(
     private val _username = MutableStateFlow("")
     private val _password = MutableStateFlow("")
     private val _firstname = MutableStateFlow("")
+    private val _surname = MutableStateFlow("")
+    private val _telephone = MutableStateFlow("")
 
-    val firstname = _firstname.asStateFlow()
     val username = _username.asStateFlow()
     val password = _password.asStateFlow()
+    val firstname = _firstname.asStateFlow()
+    val surname = _surname.asStateFlow()
+    val telephone = _telephone.asStateFlow()
 
     fun setUsername(username: String) {
         _username.value = username
     }
 
-    fun setFirstname(firstname: String) {
+    fun setFirstname(firstname: String ) {
         _firstname.value = firstname
+    }
+
+    fun setSurname(surname: String) {
+        _surname.value = surname
+    }
+
+    fun setTelephone(telephone: String) {
+        _telephone.value = telephone
     }
 
     fun setPassword(password: String) {
@@ -63,6 +75,48 @@ class OnboardingViewModel(
             println("AAB - Entered username = " + username.value)
             println("AAB - Entered password = " + password.value)
             println("AAB - Server password = " + user?.password)
+
+            if (user != null) {
+                println("AAB - USER IS NOT NULL ")
+                val serverPassword = user.password.trim()
+                val enteredPassword = password.value.trim()
+                val firstname = user.firstname
+
+                if (enteredPassword.equals(serverPassword)) {
+                    setFirstname(firstname)
+                    println("AAB - password matches ")
+                    _loginState.update { currentState ->
+                        currentState.copy(
+                            authenticated = true,
+                            usertypeId = user.usertypeid,
+                            statusId = user.statusid,
+                            userid = user.id
+                        )
+                    }
+                    saveUsername()
+                }
+            }
+            else {
+                println("AAB - user is null ")
+                _loginState.update { currentState ->
+                    currentState.copy(
+                        authenticated = false,
+                    )
+                }
+            }
+        }
+    }
+
+    fun registerUsernamePassword( ) {
+        viewModelScope.launch {
+             println("AAB - Entered username = " + username.value)
+            println("AAB - Entered password = " + password.value)
+            println("AAB - Entered firstname = " + firstname.value)
+            println("AAB - Entered surname = " + surname.value)
+            println("AAB - Entered telephone = " + telephone.value)
+
+            val user = settingsRepository.registerUsernamePassword(username.value,
+                password.value, firstname.value, surname.value, telephone.value )
 
             if (user != null) {
                 println("AAB - USER IS NOT NULL ")

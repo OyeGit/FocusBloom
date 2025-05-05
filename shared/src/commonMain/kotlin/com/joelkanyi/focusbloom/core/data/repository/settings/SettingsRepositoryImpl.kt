@@ -20,9 +20,15 @@ import com.joelkanyi.focusbloom.AppLogger
 import com.joelkanyi.focusbloom.client.User
 import com.joelkanyi.focusbloom.core.data.local.setting.PreferenceManager
 import com.joelkanyi.focusbloom.core.domain.repository.settings.SettingsRepository
+import com.joelkanyi.focusbloom.core.utils.convertJsonToObject
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
+import io.ktor.http.encodedPath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 
@@ -112,6 +118,33 @@ class SettingsRepositoryImpl(
         val client = HttpClient()
         val response = client.get("http://37.148.204.80:8080/byLogin/"+email)
         println( "AAB - "+response.bodyAsText()   )
+        client.close()
+        return convertJsonToObject( response.bodyAsText() )
+    }
+
+    override suspend fun registerUsernamePassword(email: String, password: String,
+                                                  firstname: String, surname:String,
+                                                  telephone: String):User?  {
+        println( "AAB - SettingsRepositoryImpl.registerUsernamePassword()" )
+   /*     val user = User( 0, firstname, surname, email,"NewUser", 1, 1,
+            "image", telephone, password )*/
+
+        val client = HttpClient()
+
+        val response = client.post("http://37.148.204.80:8080/users/register/") {
+            parameter("_id", "0" )
+            parameter("_firstname", firstname )
+            parameter("_surname", surname )
+            parameter("_emailaddress", email )
+            parameter("_description", "New User" )
+            parameter("_statusid", 1 )
+            parameter("_usertypeid", 1 )
+            parameter("_userimage", "image" )
+            parameter("_telephone", telephone )
+            parameter("_password", password )
+        }
+        println( "AAB - "+response.bodyAsText()   )
+        client.close()
         return convertJsonToObject( response.bodyAsText() )
     }
 
@@ -120,15 +153,7 @@ class SettingsRepositoryImpl(
         AppLogger.i( tag, "saveUsernamePassword() - username = "+username )
     }
 
-    private fun convertJsonToObject(jsonString: String): User ? {
-        return try {
-            Json.decodeFromString<User>(jsonString)
-        } catch (e: Exception) {
-            // Handle parsing errors, e.g., invalid JSON format
-            println("Error decoding JSON: ${e.message}")
-            null
-        }
-    }
+
 
     override fun getUsername(): Flow<String?> {
         return preferenceManager.getString(key = PreferenceManager.USERNAME)

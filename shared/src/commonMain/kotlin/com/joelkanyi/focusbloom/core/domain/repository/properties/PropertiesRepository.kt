@@ -18,10 +18,13 @@ package com.joelkanyi.focusbloom.core.domain.repository.properties
 import com.joelkanyi.focusbloom.core.domain.model.Property
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface PropertiesRepository {
-    fun getProperties(queryParams: HashMap<String, Any?>): Flow<List<Property>>
-    fun getProperty(id: Int):  Flow<List<Property>>
+
+    fun getProperties(queryParams: HashMap<String, Any?>): Flow<List<Property>>?
+
+    //fun getProperty(id: Int):  Flow<List<Property>>
 
     /*
 suspend fun addTask(task: Task)
@@ -44,3 +47,5 @@ suspend fun updateAllTasksActiveStatusToInactive()
 
  */
 }
+
+

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.joelkanyi.focusbloom.client.User
 import com.joelkanyi.focusbloom.core.domain.model.SessionType
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import com.joelkanyi.focusbloom.core.domain.model.taskTypes
@@ -42,6 +43,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.DrawableResource
 import org.koin.compose.currentKoinScope
 import kotlin.jvm.JvmInline
@@ -626,5 +628,16 @@ inline fun <reified T : ViewModel> koinViewModel(): T {
     val scope = currentKoinScope()
     return viewModel {
         scope.get<T>()
+    }
+}
+
+
+public fun convertJsonToObject(jsonString: String): User? {
+    return try {
+        Json.decodeFromString<User>(jsonString)
+    } catch (e: Exception) {
+        // Handle parsing errors, e.g., invalid JSON format
+        println("Error decoding JSON: ${e.message}")
+        null
     }
 }

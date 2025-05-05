@@ -90,6 +90,9 @@ fun UsernameScreen(
 ) {
     val viewModel = koinViewModel<OnboardingViewModel>()
     val username = viewModel.username.collectAsState().value
+    val firstname = viewModel.firstname.collectAsState().value
+    val surname = viewModel.surname.collectAsState().value
+    val telephone = viewModel.telephone.collectAsState().value
     val password = viewModel.password.collectAsState().value
     var showPassword by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -117,44 +120,48 @@ fun UsernameScreen(
 
     UsernameScreenContent(
         username = username,
-        password=password,
+        password= password,
+        firstname = firstname,
+        surname = surname,
+        telephone = telephone,
         typeWriterTextParts = viewModel.typeWriterTextParts,
         onUsernameChange = {
             viewModel.setUsername(it)
+        },
+        onSignInClick = {
+            navController.navigate(Destinations.Home)
+        },
+        onFirstNameChange = {
+            viewModel.setFirstname(it)
+        },
+        onSurNameChange = {
+            viewModel.setSurname(it)
+        },
+        onTelephoneChange = {
+            viewModel.setTelephone(it)
         },
         onPasswordChange = {
             viewModel.setPassword(it)
         },
         onClickContinue = {
             keyboardController?.hide()
-            viewModel.saveUsernamePassword()
+            viewModel.registerUsernamePassword()
         },
     )
 }
 
 @Composable
-fun signInWith () {
+fun signInWith (
+    onSignInClick:(String) -> Unit, ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding( top=28.dp )
+            .padding( top=16.dp )
 
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                "forgot password?",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                textDecoration = TextDecoration.Underline,
-                fontSize = 12.sp
-            )
-        }
 
-        Spacer_32dp()
+        Spacer_12dp()
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -179,30 +186,40 @@ fun signInWith () {
         }
         Spacer_12dp()
         Row(   modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+
             ) {
             Text(
-                text = "Don't have an account? ",
+                text = "Already have an account? ",
             )
             Spacer_4dp()
             Text(
                 modifier = Modifier.clickable {
                     //navigateToRegister()
+                    onSignInClick("")
                 },
-                text = "Sign up",
+                text = "Sign in",
                 color = MaterialTheme.colorScheme.primary,
                 textDecoration = TextDecoration.Underline
             )
         }
-
     }
 }
+
 @Composable
 fun UsernameScreenContent(
     username: String,
     password: String,
+    firstname: String,
+    surname: String,
+    telephone: String,
     typeWriterTextParts: List<String>,
+    onFirstNameChange: (String) -> Unit,
+    onSurNameChange: (String) -> Unit,
+    onTelephoneChange: (String) -> Unit,
     onUsernameChange: (String) -> Unit,
+    onSignInClick:(String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onClickContinue: () -> Unit,
 ) {
@@ -219,11 +236,11 @@ fun UsernameScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = "What's your email address?",
                 style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                 ),
             )
         }
@@ -238,6 +255,7 @@ fun UsernameScreenContent(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 name = username,
+                label = "johndoe@mail.com",
                 onNameChange = {
                     onUsernameChange(it)
                 },
@@ -248,11 +266,11 @@ fun UsernameScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = "What's your password?",
                 style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                 ),
             )
         }
@@ -276,7 +294,82 @@ fun UsernameScreenContent(
         }
 
         item {
-            signInWith()
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "What's your firstname?",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 12.sp,
+                ),
+            )
+        }
+
+        item {
+            UsernameTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                name = firstname,
+                label = "John",
+                onNameChange = {
+                    onFirstNameChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "What's your surname?",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 12.sp,
+                ),
+            )
+        }
+
+        item {
+            UsernameTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                name = surname,
+                label = "Doe",
+                onNameChange = {
+                    onSurNameChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "Whats your telephone?",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 12.sp,
+                ),
+            )
+        }
+
+        item {
+
+            UsernameTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                name = telephone,
+                label = "(+234) 08022234874",
+                onNameChange = {
+                    onTelephoneChange(it)
+                },
+                onClickDone = {
+                    onClickContinue()
+                },
+            )
+        }
+
+        item {
+            signInWith(onSignInClick)
         }
 
         item {
@@ -284,7 +377,7 @@ fun UsernameScreenContent(
                 username.isNotEmpty(),
             ) {
                 Column {
-                    Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -309,6 +402,7 @@ fun UsernameScreenContent(
 private fun UsernameTextField(
     modifier: Modifier,
     name: String,
+    label:String,
     onNameChange: (String) -> Unit,
     onClickDone: () -> Unit,
 ) {
@@ -320,10 +414,10 @@ private fun UsernameTextField(
         singleLine = true,
         placeholder = {
             Text(
-                text = "John Doe",
+                text = label,
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.ExtraLight,
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     letterSpacing = -(1.6).sp,
                     lineHeight = 32.sp,
                 ),
@@ -338,7 +432,7 @@ private fun UsernameTextField(
         ),
         textStyle = MaterialTheme.typography.labelLarge.copy(
             fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
+            fontSize = 16.sp,
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done,

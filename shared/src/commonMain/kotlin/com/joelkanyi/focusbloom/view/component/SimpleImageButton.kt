@@ -19,7 +19,7 @@ import presentation.theme.DefaultImageButtonTheme
 @Composable
 fun SimpleImageButton(image: DrawableResource, onClick: () -> Unit = {}) {
     Button(
-        modifier = Modifier.size(70.dp),
+        modifier = Modifier.size(62.dp),
         onClick = onClick,
         //colors = DefaultImageButtonTheme(),
         border = BorderStroke(1.dp, BorderColor),
@@ -29,7 +29,7 @@ fun SimpleImageButton(image: DrawableResource, onClick: () -> Unit = {}) {
         Image(
             painterResource(image),
             contentDescription = null,
-            modifier = Modifier.size(70.dp)
+            modifier = Modifier.size(60.dp)
         )
     }
 }

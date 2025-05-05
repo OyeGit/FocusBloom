@@ -106,7 +106,7 @@ fun HomeScreen(
     val lat: Double = 6.5255
     val lng: Double = 3.3792
     val tasksState = viewModel.tasks.collectAsState().value
-    val propertiesState = viewModel.properties.collectAsState().value
+    val propertiesState = viewModel.properties?.collectAsState()?.value
     val username = viewModel.username.collectAsState().value ?: ""
     val firstname = viewModel.firstname.collectAsState().value ?: ""
     val hourFormat = viewModel.hourFormat.collectAsState().value
@@ -172,57 +172,59 @@ fun HomeScreen(
         }
     }
 
-    HomeScreenContent(
-        tasksState = tasksState,
-        timerState = timerState,
-        selectedStateOfN = selectedStateOfN,
-        tickingTime = tickingTime,
-        focusTimeColor = focusColor,
-        shortBreakColor = shortBreakColor,
-        longBreakColor = longBreakColor,
-        hourFormat = hourFormat,
-        sessionTime = sessionTime,
-        shortBreakTime = shortBreakTime,
-        longBreakTime = longBreakTime,
-        username = username,
-        firstname = firstname,
-        propertiesState = propertiesState,
-        onClickTask = {
-            if (it.date.date < today().date) {
+    if (propertiesState != null) {
+        HomeScreenContent(
+            tasksState = tasksState,
+            timerState = timerState,
+            selectedStateOfN = selectedStateOfN,
+            tickingTime = tickingTime,
+            focusTimeColor = focusColor,
+            shortBreakColor = shortBreakColor,
+            longBreakColor = longBreakColor,
+            hourFormat = hourFormat,
+            sessionTime = sessionTime,
+            shortBreakTime = shortBreakTime,
+            longBreakTime = longBreakTime,
+            username = username,
+            firstname = firstname,
+            propertiesState = propertiesState,
+            onClickTask = {
+                if (it.date.date < today().date) {
+                    viewModel.selectTask(it)
+                    viewModel.openBottomSheet(true)
+                } else {
+                    navController.navigate(Destinations.TaskProgress(taskId = it.id))
+                }
+            },
+            onClickSeeAllTasks = {
+                navController.navigate(Destinations.AllTasks(it))
+            },
+            onClickTaskOptions = {
                 viewModel.selectTask(it)
                 viewModel.openBottomSheet(true)
-            } else {
-                navController.navigate(Destinations.TaskProgress(taskId = it.id))
-            }
-        },
-        onClickSeeAllTasks = {
-            navController.navigate(Destinations.AllTasks(it))
-        },
-        onClickTaskOptions = {
-            viewModel.selectTask(it)
-            viewModel.openBottomSheet(true)
-        },
-        onClickActiveTaskOptions = {
-            when (timerState) {
-                TimerState.Ticking -> {
-                    Timer.pause()
+            },
+            onClickActiveTaskOptions = {
+                when (timerState) {
+                    TimerState.Ticking -> {
+                        Timer.pause()
+                    }
+
+                    TimerState.Paused -> {
+                        Timer.resume()
+                    }
+
+                    else -> {}
                 }
+            },
+            onClickAddTask = {
+                navController.navigate(Destinations.AddTask())
+            },
+            onClickSearchProperties = {
+                navController.navigate(Destinations.AddSearchProperty( 0, 0))
+            } ,
 
-                TimerState.Paused -> {
-                    Timer.resume()
-                }
-
-                else -> {}
-            }
-        },
-        onClickAddTask = {
-            navController.navigate(Destinations.AddTask())
-        },
-        onClickSearchProperties = {
-            navController.navigate(Destinations.AddSearchProperty( 0, 0))
-        } ,
-
-    )
+            )
+    }
 }
 
    @OptIn(ExperimentalMaterialApi::class)

@@ -29,6 +29,7 @@ import com.joelkanyi.focusbloom.database.BloomDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.StateFlow
 
 class PropertiesRepositoryImpl(
     bloomDatabase: BloomDatabase,
@@ -41,13 +42,13 @@ class PropertiesRepositoryImpl(
         return  listOf( propReqResp.getProperties() ).asFlow()
     }
 
-    override fun getProperty(id: Int): Flow<List<Property>> {
+   /* override fun getProperty(id: Int): Flow<List<Property>> {
 
         val queryParam =hashMapOf<String, Any?>()
         queryParam["idProp"] = id
 
         val propReqResp = PropertyRequestResponse(queryParam)
         return listOf( propReqResp.getProperty(id) ).asFlow()
-    }
+    }*/
 
 }

@@ -39,6 +39,9 @@ interface SettingsRepository {
     fun saveUsername(value: String)
     fun saveFirstname(value: String)
     suspend fun loginUsernamePassword(email: String, password: String ): User?
+    suspend fun registerUsernamePassword(email: String, password: String,
+                                         firstname: String, surname:String,
+                                         telephone: String ): User ?
     fun saveUsernamePassword(username: String, password: String)
     fun getUsername(): Flow<String?>
     fun getFirstname(): Flow<String?>

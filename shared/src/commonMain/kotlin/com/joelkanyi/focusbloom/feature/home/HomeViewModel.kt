@@ -53,7 +53,7 @@ class HomeViewModel(
     }
 
     val properties = propertiesRepository.getProperties( queryParam  )
-        .map { properties ->
+        ?.map { properties ->
             PropertiesState.Success(
                 queryParam = queryParam,
                 propertyList = properties
@@ -61,7 +61,7 @@ class HomeViewModel(
 
             )
         }
-        .stateIn(
+        ?.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = TasksState.Loading,
