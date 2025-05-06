@@ -25,6 +25,9 @@ sealed class Destinations {
     object Username
 
     @Serializable
+    object loginScreen
+
+    @Serializable
     object Home
 
     @Serializable

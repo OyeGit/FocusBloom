@@ -262,55 +262,6 @@ fun UserRegisterScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(14.dp))
-            Text(
-                text = "What's your firstname",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
-                ),
-            )
-        }
-
-        item {
-            UsernameTextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                name = username,
-                onNameChange = {
-                    onUsernameChange(it)
-                },
-                onClickDone = {
-                    onClickContinue()
-                },
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(14.dp))
-            Text(
-                text = "telephone",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
-                ),
-            )
-        }
-
-        item {
-
-            UsernameTextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                name = username,
-                onNameChange = {
-                    onUsernameChange(it)
-                },
-                onClickDone = {
-                    onClickContinue()
-                },
-            )
-        }
-
-        item {
             signInRegisterWith()
         }
 

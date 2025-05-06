@@ -15,11 +15,13 @@
  */
 package com.joelkanyi.focusbloom.core.domain.repository.tasks
 
+import com.joelkanyi.focusbloom.core.domain.model.Lagos
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import kotlinx.coroutines.flow.Flow
 
 interface TasksRepository {
     fun getTasks(): Flow<List<Task>>
+    suspend fun getLagos(): Flow<List<Lagos>>?
     fun getTask(id: Int): Flow<Task?>
     suspend fun addTask(task: Task)
     suspend fun updateTask(task: Task)

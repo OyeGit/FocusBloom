@@ -48,6 +48,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -103,10 +104,13 @@ fun HomeScreen(
         navBarColor = MaterialTheme.colorScheme.background,
     )
 
+    //val serialUiState by viewModel.uiState.collectAsState()
+
+    //viewModel.getLagos()
+
     val lat: Double = 6.5255
     val lng: Double = 3.3792
     val tasksState = viewModel.tasks.collectAsState().value
-    val propertiesState = viewModel.properties?.collectAsState()?.value
     val username = viewModel.username.collectAsState().value ?: ""
     val firstname = viewModel.firstname.collectAsState().value ?: ""
     val hourFormat = viewModel.hourFormat.collectAsState().value
@@ -172,59 +176,58 @@ fun HomeScreen(
         }
     }
 
-    if (propertiesState != null) {
-        HomeScreenContent(
-            tasksState = tasksState,
-            timerState = timerState,
-            selectedStateOfN = selectedStateOfN,
-            tickingTime = tickingTime,
-            focusTimeColor = focusColor,
-            shortBreakColor = shortBreakColor,
-            longBreakColor = longBreakColor,
-            hourFormat = hourFormat,
-            sessionTime = sessionTime,
-            shortBreakTime = shortBreakTime,
-            longBreakTime = longBreakTime,
-            username = username,
-            firstname = firstname,
-            propertiesState = propertiesState,
-            onClickTask = {
-                if (it.date.date < today().date) {
-                    viewModel.selectTask(it)
-                    viewModel.openBottomSheet(true)
-                } else {
-                    navController.navigate(Destinations.TaskProgress(taskId = it.id))
-                }
-            },
-            onClickSeeAllTasks = {
-                navController.navigate(Destinations.AllTasks(it))
-            },
-            onClickTaskOptions = {
+
+    HomeScreenContent(
+        tasksState = tasksState,
+        timerState = timerState,
+        selectedStateOfN = selectedStateOfN,
+        tickingTime = tickingTime,
+        focusTimeColor = focusColor,
+        shortBreakColor = shortBreakColor,
+        longBreakColor = longBreakColor,
+        hourFormat = hourFormat,
+        sessionTime = sessionTime,
+        shortBreakTime = shortBreakTime,
+        longBreakTime = longBreakTime,
+        username = username,
+        firstname = firstname,
+        onClickTask = {
+            if (it.date.date < today().date) {
                 viewModel.selectTask(it)
                 viewModel.openBottomSheet(true)
-            },
-            onClickActiveTaskOptions = {
-                when (timerState) {
-                    TimerState.Ticking -> {
-                        Timer.pause()
-                    }
-
-                    TimerState.Paused -> {
-                        Timer.resume()
-                    }
-
-                    else -> {}
+            } else {
+                navController.navigate(Destinations.TaskProgress(taskId = it.id))
+            }
+        },
+        onClickSeeAllTasks = {
+            navController.navigate(Destinations.AllTasks(it))
+        },
+        onClickTaskOptions = {
+            viewModel.selectTask(it)
+            viewModel.openBottomSheet(true)
+        },
+        onClickActiveTaskOptions = {
+            when (timerState) {
+                TimerState.Ticking -> {
+                    Timer.pause()
                 }
-            },
-            onClickAddTask = {
-                navController.navigate(Destinations.AddTask())
-            },
-            onClickSearchProperties = {
-                navController.navigate(Destinations.AddSearchProperty( 0, 0))
-            } ,
 
-            )
-    }
+                TimerState.Paused -> {
+                    Timer.resume()
+                }
+
+                else -> {}
+            }
+        },
+        onClickAddTask = {
+            navController.navigate(Destinations.AddTask())
+        },
+        onClickSearchProperties = {
+            navController.navigate(Destinations.AddSearchProperty( 0, 0))
+        } ,
+
+        )
+
 }
 
    @OptIn(ExperimentalMaterialApi::class)
@@ -240,7 +243,6 @@ fun HomeScreen(
        longBreakTime: Int,
        username: String,
        firstname: String,
-       propertiesState: Any,
        onClickTask: (task: Task) -> Unit,
        onClickSeeAllTasks: (type: String) -> Unit,
        onClickTaskOptions: (task: Task) -> Unit,
@@ -259,43 +261,59 @@ fun HomeScreen(
                    .fillMaxSize(),
            ) {
 
-               when (propertiesState) {
 
-                   PropertiesState.Loading -> {
-                       println("ABC properties Failing = ")
-                   }
+                  //val properties = viewModel.
+                      // propertiesState.propertyList.sortedByDescending { it.idProp }
 
-                  is PropertiesState.Success -> {
-                      val properties =
-                          propertiesState.propertyList.sortedByDescending { it.idProp }
-                      println("ABC properties = " + properties.size)
-                      val pictures = SnapshotStateList<PictureData>()
-                      println("ABC pictures = " + pictures.size)
-                      Column( ) {
+                  val pictures = SnapshotStateList<PictureData>()
+                  println("ABC pictures = " + pictures.size)
+                  Column( ) {
 
-                          Text(
-                              text = "Hi, ${firstname}!",
-                              style = MaterialTheme.typography.displaySmall,
+                      Text(
+                          text = "Hi, ${firstname}!",
+                          style = MaterialTheme.typography.displaySmall,
+                      )
+
+                      MyPropertySummary()
+
+                      val statesOfN: List<String> = listOf("Lagos", "Oyo", "Ogun")
+
+                      Row() {
+
+                          BloomDropDown(
+                              label = {
+                                  Text(
+                                      text = "State",
+                                      style = MaterialTheme.typography.titleSmall.copy(
+                                          fontWeight = FontWeight.SemiBold,
+                                          fontSize = 16.sp,
+                                      ),
+                                  )
+                              },
+                              modifier = Modifier.fillMaxWidth(),
+                              options = statesOfN,
+                              selectedOption = {
+                                  TextFieldState(selectedStateOfN)
+                              },
+                              onOptionSelected = {
+                                  //onSelectedTaskTypeChange
+                              },
+                              textStyle = MaterialTheme.typography.titleSmall.copy(
+                                  fontSize = 16.sp,
+                              ),
                           )
 
-                          MyPropertySummary()
+                      }
 
-                          val statesOfN: List<String> = listOf("Lagos", "Oyo", "Ogun")
+                      LazyColumn(
+                          contentPadding = PaddingValues(horizontal = 16.dp),
+                          verticalArrangement = Arrangement.spacedBy(8.dp),
+                      ) {
 
-                          Row() {
+                          item {
 
-                              BloomDropDown(
-                                  label = {
-                                      Text(
-                                          text = "State",
-                                          style = MaterialTheme.typography.titleSmall.copy(
-                                              fontWeight = FontWeight.SemiBold,
-                                              fontSize = 16.sp,
-                                          ),
-                                      )
-                                  },
+                              ChipsPropertyType(
                                   modifier = Modifier.fillMaxWidth(),
-                                  options = statesOfN,
                                   selectedOption = {
                                       TextFieldState(selectedStateOfN)
                                   },
@@ -307,283 +325,38 @@ fun HomeScreen(
                                   ),
                               )
 
+                              ChipsPropertyUse(
+                                  modifier = Modifier.fillMaxWidth(),
+                                  selectedOption = {
+                                      TextFieldState(selectedStateOfN)
+                                  },
+                                  onOptionSelected = {
+                                      //onSelectedTaskTypeChange
+                                  },
+                                  textStyle = MaterialTheme.typography.titleSmall.copy(
+                                      fontSize = 16.sp,
+                                  ),
+                              )
                           }
 
-                          LazyColumn(
-                              contentPadding = PaddingValues(horizontal = 16.dp),
-                              verticalArrangement = Arrangement.spacedBy(8.dp),
+
+                          /*items(
+                              items = properties.take(5),
+                              key = { it.idProp },
                           ) {
-
-                              item {
-
-                                  ChipsPropertyType(
-                                      modifier = Modifier.fillMaxWidth(),
-                                      selectedOption = {
-                                          TextFieldState(selectedStateOfN)
-                                      },
-                                      onOptionSelected = {
-                                          //onSelectedTaskTypeChange
-                                      },
-                                      textStyle = MaterialTheme.typography.titleSmall.copy(
-                                          fontSize = 16.sp,
-                                      ),
-                                  )
-
-                                  ChipsPropertyUse(
-                                      modifier = Modifier.fillMaxWidth(),
-                                      selectedOption = {
-                                          TextFieldState(selectedStateOfN)
-                                      },
-                                      onOptionSelected = {
-                                          //onSelectedTaskTypeChange
-                                      },
-                                      textStyle = MaterialTheme.typography.titleSmall.copy(
-                                          fontSize = 16.sp,
-                                      ),
-                                  )
-                              }
-
-
-                              items(
-                                  items = properties.take(5),
-                                  key = { it.idProp },
-                              ) {
-                                  PropertyCard(
-                                      type = "overdue",
-                                      property = it,
-                                      onClick = onClickTask,
-                                      pictures = pictures
-                                  )
-                              }
-                          }
+                              PropertyCard(
+                                  type = "overdue",
+                                  property = it,
+                                  onClick = onClickTask,
+                                  pictures = pictures
+                              )
+                          }*/
                       }
+                  }
                   }
                }
 
-               /*
-               when (tasksState) {
-                   TasksState.Loading -> {
-                       CircularProgressIndicator(
-                           modifier = Modifier.align(Alignment.Center),
-                       )
-                   }
-
-                   is TasksState.Success -> {
-                       val tasks = tasksState.tasks.sortedByDescending { it.completed.not() }
-                       val overdueTasks = tasksState.overdueTasks
-                       val activeTask = tasks.firstOrNull { it.active }
-
-                       LazyColumn(
-                           contentPadding = PaddingValues(horizontal = 16.dp),
-                           verticalArrangement = Arrangement.spacedBy(8.dp),
-                       ) {
-                           if (activeTask != null) {
-                               item {
-                                   val containerColor = when (activeTask.current.sessionType()) {
-                                       SessionType.Focus -> {
-                                           if (focusTimeColor == null || focusTimeColor == 0L) {
-                                               Color(SessionColor)
-                                           } else {
-                                               Color(
-                                                   focusTimeColor,
-                                               )
-                                           }
-                                       }
-
-                                       SessionType.LongBreak -> {
-                                           if (longBreakColor == null || longBreakColor == 0L) {
-                                               Color(LongBreakColor)
-                                           } else {
-                                               Color(
-                                                   longBreakColor,
-                                               )
-                                           }
-                                       }
-
-                                       SessionType.ShortBreak -> {
-                                           if (shortBreakColor == null || shortBreakColor == 0L) {
-                                               Color(ShortBreakColor)
-                                           } else {
-                                               Color(
-                                                   shortBreakColor,
-                                               )
-                                           }
-                                       }
-                                   }
-                                   ActiveTaskCard(
-                                       task = activeTask,
-                                       onClick = onClickTask,
-                                       containerColor = containerColor,
-                                       onClickTaskOptions = onClickActiveTaskOptions,
-                                       timerState = timerState,
-                                       tickingTime = tickingTime,
-                                   )
-                               }
-                           }
-
-                           item {
-                               Text(
-                                   text = "Hello, ${username.pickFirstName()}!",
-                                   style = MaterialTheme.typography.displaySmall,
-                               )
-                           }
-
-                           item {
-                               MyPropertySummary(tasks)
-                           }
-
-
-                           item {
-
-                               ChipsPropertyType(
-                                   modifier = Modifier.fillMaxWidth(),
-                                   selectedOption = {
-                                       TextFieldState(selectedStateOfN)
-                                   },
-                                   onOptionSelected = {
-                                       //onSelectedTaskTypeChange
-                                   },
-                                   textStyle = MaterialTheme.typography.titleSmall.copy(
-                                       fontSize = 16.sp,
-                                   ),
-                               )
-
-                               ChipsPropertyUse(
-                                   modifier = Modifier.fillMaxWidth(),
-                                   selectedOption = {
-                                       TextFieldState(selectedStateOfN)
-                                   },
-                                   onOptionSelected = {
-                                       //onSelectedTaskTypeChange
-                                   },
-                                   textStyle = MaterialTheme.typography.titleSmall.copy(
-                                       fontSize = 16.sp,
-                                   ),
-                               )
-                           }
-
-
-                           item {
-
-                               val statesOfN: List<String> = listOf("Lagos", "Oyo", "Ogun")
-                               BloomDropDown(
-                                   label = {
-                                       Text(
-                                           text = "State",
-                                           style = MaterialTheme.typography.titleSmall.copy(
-                                               fontWeight = FontWeight.SemiBold,
-                                               fontSize = 16.sp,
-                                           ),
-                                       )
-                                   },
-                                   modifier = Modifier.fillMaxWidth(),
-                                   options = statesOfN,
-                                   selectedOption = {
-                                       TextFieldState(selectedStateOfN)
-                                   },
-                                   onOptionSelected = {
-                                       //onSelectedTaskTypeChange
-                                   },
-                                   textStyle = MaterialTheme.typography.titleSmall.copy(
-                                       fontSize = 16.sp,
-                                   ),
-                               )
-                           }
-
-                           /*if (tasks.isNotEmpty()) {
-                            item {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(
-                                        text = "Today's Tasks (${tasks.size})",
-                                        style = MaterialTheme.typography.titleLarge.copy(
-                                            fontWeight = FontWeight.Bold,
-                                        ),
-                                    )
-                                    if (tasks.size > 3) {
-                                        Text(
-                                            modifier = Modifier.clickable {
-                                                onClickSeeAllTasks("today")
-                                            },
-                                            text = "See All",
-                                            style = MaterialTheme.typography.labelLarge.copy(
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = MaterialTheme.colorScheme.primary,
-                                                fontSize = 16.sp,
-                                            ),
-                                        )
-                                    }
-                                }
-                            }
-                        }*/
-
-                           if (tasks.all { it.completed }.not()) {
-                               items(
-                                   items = tasks.take(3),
-                                   key = { it.id },
-                               ) {
-                                   TaskCard(
-                                       type = "today",
-                                       task = it,
-                                       onClick = onClickTask,
-                                       onShowTaskOption = onClickTaskOptions,
-                                       hourFormat = hourFormat,
-                                       focusSessions = it.focusSessions,
-                                       sessionTime = sessionTime,
-                                       shortBreakTime = shortBreakTime,
-                                       longBreakTime = longBreakTime,
-                                   )
-                               }
-                           }
-
-
-                           if (tasks.all { it.completed }.not()) {
-                               items(
-                                   items = tasks.take(3),
-                                   key = { it.id },
-                               ) {
-                                   TaskCard(
-                                       type = "today",
-                                       task = it,
-                                       onClick = onClickTask,
-                                       onShowTaskOption = onClickTaskOptions,
-                                       hourFormat = hourFormat,
-                                       focusSessions = it.focusSessions,
-                                       sessionTime = sessionTime,
-                                       shortBreakTime = shortBreakTime,
-                                       longBreakTime = longBreakTime,
-                                   )
-                               }
-                           }
-
-
-                           /*if ((tasks.all { it.completed } || tasks.isEmpty()) && overdueTasks.isEmpty()) {
-                               item {
-                                   StartOrCompletedTaskComponent(
-                                       tasks = tasks,
-                                       onClickAddTask = onClickAddTask,
-                                       onClickSearchProperties = onClickSearchProperties
-                                   )
-                               }
-                           }*/
-
-                       }
-
-                   }
-
-
-               }
-*/
-
            }
-
-    }
-}
-
 
 
 @Composable

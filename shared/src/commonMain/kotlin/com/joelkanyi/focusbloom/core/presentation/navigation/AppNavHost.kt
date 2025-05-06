@@ -26,6 +26,7 @@ import com.joelkanyi.focusbloom.feature.calendar.CalendarScreen
 import com.joelkanyi.focusbloom.feature.home.AllTasksScreen
 import com.joelkanyi.focusbloom.feature.home.HomeScreen
 import com.joelkanyi.focusbloom.feature.onboarding.OnboardingScreen
+import com.joelkanyi.focusbloom.feature.onboarding.UserLoginScreen
 import com.joelkanyi.focusbloom.feature.onboarding.UsernameScreen
 import com.joelkanyi.focusbloom.feature.settings.SettingsScreen
 import com.joelkanyi.focusbloom.feature.statistics.AllStatisticsScreen
@@ -45,6 +46,12 @@ fun AppNavHost(
     ) {
         composable<Destinations.Onboarding> {
             OnboardingScreen(
+                navController = navController
+            )
+        }
+
+        composable<Destinations.loginScreen> {
+            UserLoginScreen(
                 navController = navController
             )
         }

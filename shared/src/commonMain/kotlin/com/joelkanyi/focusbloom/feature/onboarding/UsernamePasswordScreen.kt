@@ -129,7 +129,7 @@ fun UsernameScreen(
             viewModel.setUsername(it)
         },
         onSignInClick = {
-            navController.navigate(Destinations.Home)
+            navController.navigate(Destinations.loginScreen)
         },
         onFirstNameChange = {
             viewModel.setFirstname(it)

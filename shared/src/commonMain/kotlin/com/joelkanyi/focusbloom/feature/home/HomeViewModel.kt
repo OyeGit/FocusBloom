@@ -19,18 +19,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joelkanyi.focusbloom.client.Client
+import com.joelkanyi.focusbloom.core.domain.model.Lagos
 import com.joelkanyi.focusbloom.core.domain.model.Property
 import com.joelkanyi.focusbloom.core.domain.model.Task
-import com.joelkanyi.focusbloom.core.domain.repository.properties.PropertiesRepository
 import com.joelkanyi.focusbloom.core.domain.repository.settings.SettingsRepository
 import com.joelkanyi.focusbloom.core.domain.repository.tasks.TasksRepository
 import com.joelkanyi.focusbloom.core.utils.plusDays
 import com.joelkanyi.focusbloom.core.utils.today
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -39,12 +41,13 @@ import kotlinx.datetime.toLocalDateTime
 class HomeViewModel(
     private val tasksRepository: TasksRepository,
     private val settingsRepository: SettingsRepository,
-    private val propertiesRepository: PropertiesRepository
 ) : ViewModel() {
+
     private val _openBottomSheet = MutableStateFlow(false)
     val openBottomSheet = _openBottomSheet.asStateFlow()
 
-    val client: Client = Client()
+/*    private val _uiState = MutableStateFlow(SerialNumberUiState())
+    val uiState: StateFlow<SerialNumberUiState> = _uiState.asStateFlow()*/
 
     val queryParam =hashMapOf<String, Any?>()
 
@@ -52,7 +55,24 @@ class HomeViewModel(
         _openBottomSheet.value = value
     }
 
-    val properties = propertiesRepository.getProperties( queryParam  )
+    fun getLagos( ) {
+        println("AAB - HomeViewModel().getLagos()")
+        viewModelScope.launch {
+            tasksRepository.getLagos()
+          /*  _uiState.update { currentState ->
+                currentState.copy(
+                    returnedList = lagosList
+                )
+            }*/
+        }
+    }
+
+    init{
+        getLagos()
+    }
+
+
+   /* val properties = propertiesRepository.getProperties( queryParam  )
         ?.map { properties ->
             PropertiesState.Success(
                 queryParam = queryParam,
@@ -65,7 +85,7 @@ class HomeViewModel(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = TasksState.Loading,
-        )
+        )*/
 
     val tasks = tasksRepository.getTasks()
         .map { tasks ->
@@ -253,3 +273,7 @@ sealed class ReminderState {
     data object Loading : ReminderState()
     data class Success(val reminderOn: Int?) : ReminderState()
 }
+
+data class SerialNumberUiState(
+    val returnedList: List<Lagos> = listOf()
+)
