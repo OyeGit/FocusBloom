@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -49,14 +51,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.joelkanyi.focusbloom.core.domain.model.Lagos
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import com.joelkanyi.focusbloom.core.utils.prettyFormat
+import com.joelkanyi.focusbloom.core.utils.rememberCustomImagePainter
 import com.joelkanyi.focusbloom.resource.PictureData
 import com.joelkanyi.focusbloom.resource.resourcePictures
 import focusbloom.shared.generated.resources.Res
 import focusbloom.shared.generated.resources.ic_complete
 import focusbloom.shared.generated.resources.il_empty
+import focusbloom.shared.generated.resources.work
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -82,15 +91,54 @@ fun PropertyCard(
         Row() {
             Column(modifier = Modifier
                 .size(140.dp) ) {
+                /*
+                             AsyncImage(
+                             model = ImageRequest.Builder(  )
+                                 .data("https://example.com/image.jpg")
+                                 .crossfade(true)
+                                 .build(),
+                             placeholder = painterResource(Res.drawable.il_empty),
+                             contentDescription = "image",
+                             contentScale = ContentScale.Crop,
+                             modifier = Modifier.clip(CircleShape)
+                             )
+                             */
 
+                         /*   AsyncImage(
+                                model = ImageRequest.Builder(LocalPlatformContext.current)
+                                    .data("http://37.148.204.80:8080/static/images/7/image2.jpeg.jpg")
+                                    //.data("https://delasign.com/delasignBlack.png")
+                                    .crossfade(true)
+                                    .build(),
+                                //model = "http://37.148.204.80:8080/static/images/7/image1.jpeg.jpg", // replace with working URL
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                placeholder = painterResource(Res.drawable.il_empty),
+                                onSuccess = {
+                                    println ("Image loaded successfully")
+                                },
+                                onError = {
+                                    println ("Error loading image"+it )
+                                }
+                            )
+*/
 
                 Image(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .align(CenterHorizontally),
-                    painter = painterResource(  Res.drawable.il_empty ) ,
-                    contentDescription = null,
+                    painter = rememberCustomImagePainter(
+                        "http://37.148.204.80:8080/static/images/7/image2.jpeg.jpg"
+                    ),
+                    null, modifier = Modifier.fillMaxSize()
                 )
+
+                         /*Image(
+                             modifier = Modifier
+                                 .size(140.dp)
+                                 .align(CenterHorizontally),
+                             painter = painterResource(  Res.drawable.il_empty ) ,
+                             contentDescription = null,
+                         )
+                        */
+
             }
 
             Column(
@@ -178,12 +226,12 @@ fun PropertyCard(
                             )
                         }
                     }
-                    if (true) {
+                    if (false) {
                         Image(
                             modifier = Modifier
                                 .size(48.dp),
                             painter = painterResource(
-                                Res.drawable.ic_complete
+                                Res.drawable.work
                             ),
                             contentDescription = "Task Options",
                         )

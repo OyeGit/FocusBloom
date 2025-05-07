@@ -128,6 +128,8 @@ kotlin {
 
             implementation(libs.ktor.client.core)
             implementation(libs.kotlinx.coroutines.core)
+            implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha06")
+            implementation("io.coil-kt.coil3:coil-network-ktor:3.0.0-alpha06")
         }
 
         androidMain.dependencies {
@@ -143,6 +145,8 @@ kotlin {
 
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            implementation("io.ktor:ktor-client-okhttp:3.1.2")
+
         }
 
         jvmMain.dependencies {
@@ -168,7 +172,7 @@ kotlin {
             implementation(libs.native.driver)
 
             implementation(libs.ktor.client.darwin)
-            implementation("io.ktor:ktor-client-darwin:3.0.1")
+            implementation("io.ktor:ktor-client-darwin:3.0.0-alpha06")
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
         }
@@ -177,6 +181,8 @@ kotlin {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(npm("uuid", "^9.0.1"))
+                //implementation("io.ktor:ktor-client-js:3.1.2-wasm2")
+
             }
         }
 
@@ -189,7 +195,6 @@ kotlin {
 dependencies {
     implementation(libs.androidx.foundation.android)
 }
-
 
 sqldelight {
     databases {

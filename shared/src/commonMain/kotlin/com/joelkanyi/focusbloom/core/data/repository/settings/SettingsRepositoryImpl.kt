@@ -16,6 +16,7 @@
 package com.joelkanyi.focusbloom.core.data.repository.settings
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.text.toLowerCase
 import com.joelkanyi.focusbloom.AppLogger
 import com.joelkanyi.focusbloom.client.User
 import com.joelkanyi.focusbloom.core.data.local.setting.PreferenceManager
@@ -115,8 +116,9 @@ class SettingsRepositoryImpl(
     }
 
     override suspend fun loginUsernamePassword(email: String, password: String): User? {
+
         val client = HttpClient()
-        val response = client.get("http://37.148.204.80:8080/byLogin/"+email)
+        val response = client.get("http://37.148.204.80:8080/byLogin/"+ email.lowercase())
         println( "AAB - "+response.bodyAsText()   )
         client.close()
         return convertJsonToObject( response.bodyAsText() )

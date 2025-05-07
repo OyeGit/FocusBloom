@@ -99,7 +99,6 @@ fun HomeScreen(
 
     val serialUiState by viewModel.uiState.collectAsState()
 
-
     //viewModel.getLagos()
 
     val lat: Double = 6.5255
@@ -221,7 +220,7 @@ fun HomeScreen(
             navController.navigate(Destinations.AddSearchProperty( 0, 0))
         } ,
 
-        )
+    )
 }
 
    @OptIn(ExperimentalMaterialApi::class)
@@ -249,6 +248,8 @@ fun HomeScreen(
        onClickSearchProperties: () -> Unit
    ) {
 
+       //val context = LocalContext.current
+       //val appContext = context.applicationContext
        Scaffold { paddingValues ->
            Box(
                modifier = Modifier
@@ -256,9 +257,6 @@ fun HomeScreen(
                    .fillMaxSize(),
            ) {
 
-
-                  //val properties = viewModel.
-                      // propertiesState.propertyList.sortedByDescending { it.idProp }
 
                   val pictures = SnapshotStateList<PictureData>()
                   println("ABC pictures = " + pictures.size)
@@ -349,8 +347,10 @@ fun HomeScreen(
                   }
                   }
                }
-
            }
+
+
+
 
 
 @Composable
