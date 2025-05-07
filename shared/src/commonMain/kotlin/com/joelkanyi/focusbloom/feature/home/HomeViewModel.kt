@@ -46,8 +46,8 @@ class HomeViewModel(
     private val _openBottomSheet = MutableStateFlow(false)
     val openBottomSheet = _openBottomSheet.asStateFlow()
 
-/*    private val _uiState = MutableStateFlow(SerialNumberUiState())
-    val uiState: StateFlow<SerialNumberUiState> = _uiState.asStateFlow()*/
+    private val _uiState = MutableStateFlow(SerialNumberUiState())
+    val uiState: StateFlow<SerialNumberUiState> = _uiState.asStateFlow()
 
     val queryParam =hashMapOf<String, Any?>()
 
@@ -58,12 +58,12 @@ class HomeViewModel(
     fun getLagos( ) {
         println("AAB - HomeViewModel().getLagos()")
         viewModelScope.launch {
-            tasksRepository.getLagos()
-          /*  _uiState.update { currentState ->
+            val lagosList = tasksRepository.getLagos()
+            _uiState.update { currentState ->
                 currentState.copy(
                     returnedList = lagosList
                 )
-            }*/
+            }
         }
     }
 

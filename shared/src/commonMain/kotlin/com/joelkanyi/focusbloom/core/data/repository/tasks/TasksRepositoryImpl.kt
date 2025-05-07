@@ -15,7 +15,6 @@
  */
 package com.joelkanyi.focusbloom.core.data.repository.tasks
 
-import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
 import com.joelkanyi.focusbloom.core.data.mapper.toTask
 import com.joelkanyi.focusbloom.core.data.mapper.toTaskEntity
@@ -24,7 +23,6 @@ import com.joelkanyi.focusbloom.core.data.utils.mapToOneOrNull
 import com.joelkanyi.focusbloom.core.domain.model.Lagos
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import com.joelkanyi.focusbloom.core.domain.repository.tasks.TasksRepository
-import com.joelkanyi.focusbloom.core.utils.convertJsonToObject
 import com.joelkanyi.focusbloom.database.BloomDatabase
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -32,7 +30,6 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
@@ -52,16 +49,16 @@ class TasksRepositoryImpl(
             }
     }
 
-    override suspend fun getLagos() : Flow<List<Lagos>>? {
+    override suspend fun getLagos() : List<Lagos> {
         println( "AAB -  TasksRepositoryImpl.getLagos()"   )
         val client = HttpClient()
         val response = client.get("http://37.148.204.80:8080/lagos")
         println( "AAB - RESPONSE "+response.bodyAsText()   )
 
-        //val lagoses: List<Lagos> = convertJsonStringToList2( response.bodyAsText() )
+        val lagoses: List<Lagos> = convertJsonStringToList2( response.bodyAsText() )
         //client.close()
         //println( "AAB - lagos.size "+lagoses )
-        return null
+        return lagoses
     }
 
     private fun convertJsonStringToList(jsonString: String): List<Lagos> {

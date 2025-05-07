@@ -28,8 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
@@ -38,18 +36,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.key.Key.Companion.R
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -57,29 +49,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.joelkanyi.focusbloom.core.domain.model.Property
+import com.joelkanyi.focusbloom.core.domain.model.Lagos
 import com.joelkanyi.focusbloom.core.domain.model.Task
-import com.joelkanyi.focusbloom.core.utils.calculateEndTime
-import com.joelkanyi.focusbloom.core.utils.durationInMinutes
 import com.joelkanyi.focusbloom.core.utils.prettyFormat
-import com.joelkanyi.focusbloom.core.utils.prettyTimeDifference
 import com.joelkanyi.focusbloom.resource.PictureData
 import com.joelkanyi.focusbloom.resource.resourcePictures
 import focusbloom.shared.generated.resources.Res
 import focusbloom.shared.generated.resources.ic_complete
-import focusbloom.shared.generated.resources.il_completed
 import focusbloom.shared.generated.resources.il_empty
-import focusbloom.shared.generated.resources.personal
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.getDrawableResourceBytes
-import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun PropertyCard(
-    property: Property,
+    property: Lagos,
     onClick: (task: Task) -> Unit,
     pictures: SnapshotStateList<PictureData>,
     type: String,
@@ -169,9 +153,9 @@ fun PropertyCard(
                                         fontSize = 18.sp,
                                     ),
                                 ) {
-                                    append("${property.city}")
+                                    append("${property.cityid}")
                                 }
-                                append("/${property.lGA}")
+                                append("/${property.lgaid}")
                             },
                         )
                         Spacer(modifier = Modifier.height(4.dp))
@@ -187,7 +171,7 @@ fun PropertyCard(
                         if (type == "overdue") {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = property.enteredDate.date.prettyFormat(),
+                                text = property.entereddate,
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = FontWeight.SemiBold,
                                 ),

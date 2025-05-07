@@ -16,7 +16,6 @@
 package com.joelkanyi.focusbloom.feature.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +36,6 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,7 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.joelkanyi.focusbloom.core.domain.model.Property
+import com.joelkanyi.focusbloom.core.domain.model.Lagos
 import com.joelkanyi.focusbloom.core.domain.model.SessionType
 import com.joelkanyi.focusbloom.core.domain.model.Task
 import com.joelkanyi.focusbloom.core.presentation.component.BloomButton
@@ -69,15 +67,10 @@ import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyType
 import com.joelkanyi.focusbloom.core.presentation.component.ChipsPropertyUse
 import com.joelkanyi.focusbloom.core.presentation.component.PropertyCard
 import com.joelkanyi.focusbloom.core.presentation.component.PropertyPublishProgress
-import com.joelkanyi.focusbloom.core.presentation.component.TaskCard
 import com.joelkanyi.focusbloom.core.presentation.component.TaskProgress
 import com.joelkanyi.focusbloom.core.presentation.navigation.Destinations
-import com.joelkanyi.focusbloom.core.presentation.theme.LongBreakColor
-import com.joelkanyi.focusbloom.core.presentation.theme.SessionColor
-import com.joelkanyi.focusbloom.core.presentation.theme.ShortBreakColor
 import com.joelkanyi.focusbloom.core.utils.koinViewModel
 import com.joelkanyi.focusbloom.core.utils.myPropertySummaryTest
-import com.joelkanyi.focusbloom.core.utils.pickFirstName
 import com.joelkanyi.focusbloom.core.utils.sessionType
 import com.joelkanyi.focusbloom.core.utils.taskCompleteMessage
 import com.joelkanyi.focusbloom.core.utils.taskCompletionPercentage
@@ -104,7 +97,8 @@ fun HomeScreen(
         navBarColor = MaterialTheme.colorScheme.background,
     )
 
-    //val serialUiState by viewModel.uiState.collectAsState()
+    val serialUiState by viewModel.uiState.collectAsState()
+
 
     //viewModel.getLagos()
 
@@ -191,6 +185,7 @@ fun HomeScreen(
         longBreakTime = longBreakTime,
         username = username,
         firstname = firstname,
+        returnedList = serialUiState.returnedList,
         onClickTask = {
             if (it.date.date < today().date) {
                 viewModel.selectTask(it)
@@ -227,7 +222,6 @@ fun HomeScreen(
         } ,
 
         )
-
 }
 
    @OptIn(ExperimentalMaterialApi::class)
@@ -243,6 +237,7 @@ fun HomeScreen(
        longBreakTime: Int,
        username: String,
        firstname: String,
+       returnedList: List<Lagos>,
        onClickTask: (task: Task) -> Unit,
        onClickSeeAllTasks: (type: String) -> Unit,
        onClickTaskOptions: (task: Task) -> Unit,
@@ -339,10 +334,9 @@ fun HomeScreen(
                               )
                           }
 
-
-                          /*items(
-                              items = properties.take(5),
-                              key = { it.idProp },
+                          items(
+                              items = returnedList.take(15),
+                              key = { it.id },
                           ) {
                               PropertyCard(
                                   type = "overdue",
@@ -350,7 +344,7 @@ fun HomeScreen(
                                   onClick = onClickTask,
                                   pictures = pictures
                               )
-                          }*/
+                          }
                       }
                   }
                   }
